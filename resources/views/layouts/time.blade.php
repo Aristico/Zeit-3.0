@@ -16,6 +16,6 @@
             @yield('content')
 
         </div>
-    <script src="/js/all.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="/js/all.js"></script>
   </body>
 </html>

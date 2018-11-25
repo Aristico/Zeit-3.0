@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
+use App\Schedule;
 use Illuminate\Http\Request;
+use Prophecy\Doubler\ClassPatch\MagicCallPatch;
 
-class UserController extends Controller
+class ScheduleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -25,8 +26,11 @@ class UserController extends Controller
     public function create()
     {
 
-        return view('admin.users.create');
+        if(isset($_GET['id'])) {$userid = $_GET['id'];}
 
+        $defaults = Schedule::where('user_id', 0)->get();
+        $days = [1=>'Montag', 2=>'Dienstag', 3=>'Mittwoch', 4=>'Donnerstag', 5=>'Freitag', 6=>'Samstag', 7=>'Sonntag'];
+        return view('admin.schedule.create', compact('days', 'defaults', 'userid'));
     }
 
     /**
@@ -37,14 +41,15 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-
         $input = $request->all();
-        $input['password'] = bcrypt($request->pasword);
-        $input['identifier'] = md5($request->email);
 
-        $success = User::create($input);
 
-        return redirect()->action('ScheduleController@create', ['id'=>$success->id]);
+        foreach ($input['day'] as $day) {
+
+            Schedule::create($day);
+
+        }
+
     }
 
     /**
@@ -66,8 +71,7 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = User::findOrFail($id);
-        return view('admin.users.edit', compact('user'));
+        //
     }
 
     /**
@@ -79,23 +83,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-        $user = User::findOrFail($id);
-
-        if($request->password !== null) {
-
-            $input = $request->all();
-            $input['password'] = bcrypt($request->password);
-
-        } else {
-
-            $input = $request->except('password');
-
-        }
-
-        $user->update($input);
-
-        return $user;
+        //
     }
 
     /**

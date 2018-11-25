@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class EntryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -24,9 +23,7 @@ class UserController extends Controller
      */
     public function create()
     {
-
-        return view('admin.users.create');
-
+        //
     }
 
     /**
@@ -37,14 +34,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-
-        $input = $request->all();
-        $input['password'] = bcrypt($request->pasword);
-        $input['identifier'] = md5($request->email);
-
-        $success = User::create($input);
-
-        return redirect()->action('ScheduleController@create', ['id'=>$success->id]);
+        //
     }
 
     /**
@@ -66,8 +56,7 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = User::findOrFail($id);
-        return view('admin.users.edit', compact('user'));
+        //
     }
 
     /**
@@ -79,23 +68,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-        $user = User::findOrFail($id);
-
-        if($request->password !== null) {
-
-            $input = $request->all();
-            $input['password'] = bcrypt($request->password);
-
-        } else {
-
-            $input = $request->except('password');
-
-        }
-
-        $user->update($input);
-
-        return $user;
+        //
     }
 
     /**

@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <h1>Benutzer anlegen</h1>
+    <h1>Benutzer bearbeiten</h1>
 
     <!-- bei Action den Controller und die Methode eintrage z.B. UserController@Create -->
     {!! Form::model($user, ['action'=>['UserController@update', $user->id], 'method' => 'put']) !!}
@@ -24,7 +24,7 @@
            {!! Form::password('password', ['title'=>'password', 'class'=>'form-control'] ) !!}
         </div>
         <div class="form-group">
-           {!! Form::submit('Anlegen', ['class'=>'btn btn-primary'] ) !!}
+           {!! Form::submit('Bearbeiten', ['class'=>'btn btn-primary'] ) !!}
         </div>
     {!! Form::close() !!}
 
