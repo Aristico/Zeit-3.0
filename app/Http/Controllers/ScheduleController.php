@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Schedule;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Prophecy\Doubler\ClassPatch\MagicCallPatch;
 
@@ -71,7 +72,13 @@ class ScheduleController extends Controller
      */
     public function edit($id)
     {
-        //
+        $lastversion = Schedule::where('user_id', '=', $id)->orderBy('version', 'desc')->first();
+        $schedule = Schedule::where('version', '=', $lastversion->version)->where('user_id', '=', $id)->get();
+        $days = [1=>'Montag', 2=>'Dienstag', 3=>'Mittwoch', 4=>'Donnerstag', 5=>'Freitag', 6=>'Samstag', 7=>'Sonntag'];
+        return view('admin.schedule.edit', compact('days', 'schedule', 'id'));
+
+    //'user_id', '=', $id
+
     }
 
     /**
@@ -83,7 +90,24 @@ class ScheduleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $date = new Carbon('Next Monday');
+
+        $input = $request->day;
+
+        if(Schedule::where('valid_from', '=', $date)->get()) {
+
+            Schedule::where('valid_from', '=', $date)->delete();
+
+        }
+
+        foreach ($input as $day) {
+
+            $day['version'] += 1;
+            $day['valid_from'] = $date->format('Y-m-d');
+            Schedule::create($day);
+
+        }
+
     }
 
     /**
