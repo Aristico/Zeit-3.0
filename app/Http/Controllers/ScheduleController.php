@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Schedule;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Prophecy\Doubler\ClassPatch\MagicCallPatch;
@@ -44,12 +45,18 @@ class ScheduleController extends Controller
     {
         $input = $request->all();
 
+        $hours = 0;
 
         foreach ($input['day'] as $day) {
 
-            Schedule::create($day);
-
+            $schedule = Schedule::create($day);
+            $hours += $schedule->regularHours();
         }
+
+        session()->flash('success_message', 'Ber Zeitplan wurde angelegt. Ihre Wochenarbeitszeit beträgt ' . $hours . ' Stunden.');
+        session()->flash('success', 'true');
+
+        return redirect(route('schedule.edit', $schedule->user_id));
 
     }
 
@@ -72,8 +79,7 @@ class ScheduleController extends Controller
      */
     public function edit($id)
     {
-        $lastversion = Schedule::where('user_id', '=', $id)->orderBy('version', 'desc')->first();
-        $schedule = Schedule::where('version', '=', $lastversion->version)->where('user_id', '=', $id)->get();
+        $schedule = User::findOrFail($id)->currentSchedule();
         $days = [1=>'Montag', 2=>'Dienstag', 3=>'Mittwoch', 4=>'Donnerstag', 5=>'Freitag', 6=>'Samstag', 7=>'Sonntag'];
         return view('admin.schedule.edit', compact('days', 'schedule', 'id'));
 
@@ -90,23 +96,42 @@ class ScheduleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $date = new Carbon('Next Monday');
 
-        $input = $request->day;
+        if($request->ready == "true") {
 
-        if(Schedule::where('valid_from', '=', $date)->get()) {
+            return redirect(route('start'));
 
-            Schedule::where('valid_from', '=', $date)->delete();
+        } else {
+
+            $hours = 0;
+
+            $date = new Carbon('Next Monday');
+            $input = $request->day;
+
+            if(Schedule::where('valid_from', '=', $date)->get()) {
+
+                Schedule::where('valid_from', '=', $date)->delete();
+
+            }
+
+            foreach ($input as $day) {
+
+                $day['version'] += 1;
+                $day['valid_from'] = $date->format('Y-m-d');
+                $schedule = Schedule::create($day);
+
+                $hours += $schedule->regularHours();
+
+            }
+
+            session()->flash('success_message', 'Der Zeitplan wurde geändert. Ihre hinterlegte Wochenarbeitszeit beträgt ' . $hours . ' Stunden');
+            session()->flash('success', 'true');
+
+            return redirect(route('schedule.edit', $schedule->user_id));
 
         }
 
-        foreach ($input as $day) {
 
-            $day['version'] += 1;
-            $day['valid_from'] = $date->format('Y-m-d');
-            Schedule::create($day);
-
-        }
 
     }
 

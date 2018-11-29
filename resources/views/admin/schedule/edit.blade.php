@@ -2,7 +2,9 @@
 
 @section('content')
 
-    <h1>Benutzer anlegen</h1>
+    @include('includes.success')
+
+    <h1>Zeitplan Bearbeiten</h1>
     <br>
     <!-- bei Action den Controller und die Methode eintrage z.B. UserController@Create -->
     {!! Form::open(['action'=>['ScheduleController@update', $id], 'method' => 'put']) !!}
@@ -38,9 +40,12 @@
             @endforeach
         @endif
 
-        <div class="form-group">
-           {!! Form::submit('Anlegen', ['class'=>'btn btn-primary'] ) !!}
-        </div>
+        @if(session('success'))
+           <button class="btn btn-primary" value="true" name="ready">Fertig</button>
+           <button class="btn btn-secondary" value="false" name="ready">Ändern</button>
+        @else
+           <button class="btn btn-primary" value="false" name="ready">Ändern</button>
+        @endif
     {!! Form::close() !!}
 
 @endsection

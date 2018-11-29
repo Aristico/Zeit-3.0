@@ -37,4 +37,23 @@ class User extends Authenticatable
         return $this->belongsTo('App/Role');
 
     }
+
+    public function entries() {
+
+        return $this->hasMany('App\Entry');
+
+    }
+
+    public function schedules() {
+
+        return $this->hasMany('App\Schedule');
+
+    }
+
+    public function currentSchedule () {
+
+        $lastversion = $this->schedules()->orderBy('version', 'desc')->first();
+        return $this->schedules()->where('version', '=', $lastversion->version)->get();
+
+    }
 }

@@ -44,6 +44,8 @@ class UserController extends Controller
 
         $success = User::create($input);
 
+        session()->flash('success_message', 'Der Benutzer wurde angelegt.');
+
         return redirect()->action('ScheduleController@create', ['id'=>$success->id]);
     }
 

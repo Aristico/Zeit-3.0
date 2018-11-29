@@ -2,7 +2,9 @@
 
 @section('content')
 
-    <h1>Benutzer anlegen</h1>
+    @include('includes.success')
+
+    <h1>Zeitplan anlegen</h1>
     <br>
     <!-- bei Action den Controller und die Methode eintrage z.B. UserController@Create -->
     {!! Form::open(['action'=>'ScheduleController@store', 'method' => 'post']) !!}
@@ -19,7 +21,7 @@
                         <p>{{$days[$default->day]}}</p>
                     </div>
                     <input type="hidden" name="day[{{$default->day}}][day]" value="{{$default->day}}">
-                    <input type="hidden" name="day[{{$default->day}}][user_id]" value="{{isset($userid) ? $userid : '0'}}">
+                    <input type="hidden" name="day[{{$default->day}}][user_id]" value="{{isset($userid) ? $userid : '9999999'}}">
 
                     <div class="form-group col-sm-4">
                        {!! Form::label('day[' . $default->day . '][begin]', 'Beginn:', ['class'=>'sr-only']) !!}
@@ -40,6 +42,10 @@
         <div class="form-group">
            {!! Form::submit('Anlegen', ['class'=>'btn btn-primary'] ) !!}
         </div>
+
     {!! Form::close() !!}
+    <!-- bei Action den Controller und die Methode eintrage z.B. UserController@Create -->
+
+
 
 @endsection

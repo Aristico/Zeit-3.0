@@ -52,7 +52,12 @@ Route::get('/test', function () {
     return $date;
 });
 
+
 Route::resource('/user', 'UserController');
 Route::resource('/schedule', 'ScheduleController');
 
+
+Route::get('/start', function () {
+    return view('user.home');
+})->name('start');
 Route::get('/enter/{identifier}', 'EntryController@enter');
