@@ -19,7 +19,12 @@ class Schedule extends Model
 
     ];
 
+
     public function regularHours () {
+
+        /* Berechnet aus den Einträgen in den Schedules die Arbeitszeit für einen Tag.
+        *  Gerundet wird immer auf die nächst Viertel-Stunde
+        * */
 
         $begin = new Carbon($this->begin);
         $difference = round((($begin->diffInSeconds(new Carbon($this->end)) - $this->break*60)/60/60)*4)/4;

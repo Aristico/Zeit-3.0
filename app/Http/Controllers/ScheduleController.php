@@ -8,6 +8,15 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Prophecy\Doubler\ClassPatch\MagicCallPatch;
 
+/* In der Tabelle Entries werden die Einträge zu den geleisteten Arbeitszeiteen
+ * eingetragen. Hier entsteht das Stundenkonto eines jeden Nutzers.
+ *
+ *
+ *
+ *
+ * */
+
+
 class ScheduleController extends Controller
 {
     /**
@@ -25,14 +34,13 @@ class ScheduleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($id)
     {
-
-        if(isset($_GET['id'])) {$userid = $_GET['id'];}
-
+        /*Lädt die Standard-Arbeitszeiten und üerzeut ein Array mit den enthaltenen Tagen.*/
         $defaults = Schedule::where('user_id', 0)->get();
         $days = [1=>'Montag', 2=>'Dienstag', 3=>'Mittwoch', 4=>'Donnerstag', 5=>'Freitag', 6=>'Samstag', 7=>'Sonntag'];
-        return view('admin.schedule.create', compact('days', 'defaults', 'userid'));
+        /*Zeigt das mit den Standardzeiten Vorausgefüllte Formular.*/
+        return view('admin.schedule.create', compact('days', 'defaults', 'id'));
     }
 
     /**
@@ -43,19 +51,30 @@ class ScheduleController extends Controller
      */
     public function store(Request $request)
     {
+        /*Sammelt den Input ein und setzt die zu Berechnende Arbeitszeit auf 0*/
+        /*Der Input besteht aus einem Array mit sieben Feldern. Für jeden Tag eines.*/
         $input = $request->all();
-
         $hours = 0;
 
+        /* Geht das Array durch und legt für jeden Tag einen Datenbank-Eintrag an
+         * Berechnet aus der Rückmeldung der Anlage die Arbeitszeit des Tages und Addiert die Stunden jedes Tages zu
+         * Einer Wochenarbeitszeit.
+         */
         foreach ($input['day'] as $day) {
 
             $schedule = Schedule::create($day);
             $hours += $schedule->regularHours();
         }
 
-        session()->flash('success_message', 'Ber Zeitplan wurde angelegt. Ihre Wochenarbeitszeit beträgt ' . $hours . ' Stunden.');
+        /* Erzeugt die Erfolgsmeldung für den folgenden Screen
+         * Die Session info "success" wird dafür benutzt um bestimmte Buttons ein/auszublenden.
+         * */
+        session()->flash('info_message', 'Bitte prüfen Sie Ihre Wochenarbeitszeit. Ihre Angabe führen zu einer Wochenarbeitszeit von ' . $hours . ' Stunden.');
         session()->flash('success', 'true');
 
+        /* Als nächstes wird das Edit-Fenster angezeigt.
+         * Hier wird die berechnete Arbeitszeit ausgewiesen und kann ggf. nochmal geändert werden.
+         * */
         return redirect(route('schedule.edit', $schedule->user_id));
 
     }
@@ -79,6 +98,8 @@ class ScheduleController extends Controller
      */
     public function edit($id)
     {
+        /* Zeigt das Bearbeiten Formular und füllt es mit den Werten aus der Datenbank aus.
+         * */
         $schedule = User::findOrFail($id)->currentSchedule();
         $days = [1=>'Montag', 2=>'Dienstag', 3=>'Mittwoch', 4=>'Donnerstag', 5=>'Freitag', 6=>'Samstag', 7=>'Sonntag'];
         return view('admin.schedule.edit', compact('days', 'schedule', 'id'));
@@ -97,23 +118,38 @@ class ScheduleController extends Controller
     public function update(Request $request, $id)
     {
 
+        /* Die Fertig Schaltfläche ersheint nur, wenn die Seite ein-Mal abgesendet wurde
+         * Wenn die Fertig Schaltfläche gedrückt wird, dann leite Weiter an Home
+         * */
+
+
         if($request->ready == "true") {
 
-            return redirect(route('start'));
+            return redirect(route('entries.init.show', $id));
 
         } else {
+
+            /* Beim ersten Aufruf und wenn nochmal geändert wurde, wird dieser Bereich abgespielt.
+             * Stunden werden für die Berechnung auf 0 gesetzt
+             * Der Request wird in ein array geschrieben
+             * Das Gültig Ab datum wird auf den kommenden Montag gelegt, damit die aktuelle Woche nicht beeinflusst wird.
+             * */
 
             $hours = 0;
 
             $date = new Carbon('Next Monday');
             $input = $request->day;
 
-            if(Schedule::where('valid_from', '=', $date)->get()) {
 
-                Schedule::where('valid_from', '=', $date)->delete();
+            /* Existiert schon eine Geänderte Version in der Zukunft, dann wird diese gelöscht.
+             * */
 
-            }
+            User::findOrFail($id)->schedules()->where('valid_from', '=', $date)->delete();
 
+
+            /* Speichert die Daten in der Datenbank. Die Version wird um eins erhöht.
+             * Das Gültig Ab Datum wird auch festgelegt.
+             * */
             foreach ($input as $day) {
 
                 $day['version'] += 1;
@@ -124,8 +160,15 @@ class ScheduleController extends Controller
 
             }
 
-            session()->flash('success_message', 'Der Zeitplan wurde geändert. Ihre hinterlegte Wochenarbeitszeit beträgt ' . $hours . ' Stunden');
+             /* Erzeugt die Erfolgsmeldung für den folgenden Screen
+              * Die Session info "success" wird dafür benutzt um bestimmte Buttons ein/auszublenden.
+              * */
+
+            session()->flash('info_message', 'Bitte prüfen Sie Ihre Wochenarbeitszeit. Ihre Angabe führen zu einer Wochenarbeitszeit von ' . $hours . ' Stunden.');
             session()->flash('success', 'true');
+
+            /* Zeigt nochmal die Bearbeiten Seite an um sie zu bestätigen oder nochmal ändern zu können.
+             * */
 
             return redirect(route('schedule.edit', $schedule->user_id));
 

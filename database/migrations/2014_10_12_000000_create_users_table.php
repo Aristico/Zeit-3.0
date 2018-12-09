@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->integer('role_id')->default(0);
             $table->string('email')->unique();
+            $table->decimal('start_balance', 8,2)->default(0);
             $table->string('identifier');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

@@ -40,11 +40,17 @@ route::get('/init', function () {
     Schedule::create(['user_id'=>0, 'day'=>6]);
     Schedule::create(['user_id'=>0, 'day'=>7]);
 
+    Schedule::create(['user_id'=>1, 'day'=>1, 'begin'=>'08:00', 'end'=>'18:00:00', 'break'=>60]);
+    Schedule::create(['user_id'=>1, 'day'=>2, 'begin'=>'08:00:00', 'end'=>'16:00:00', 'break'=>60]);
+    Schedule::create(['user_id'=>1, 'day'=>3, 'begin'=>'08:00:00', 'end'=>'16:00:00', 'break'=>60]);
+    Schedule::create(['user_id'=>1, 'day'=>4, 'begin'=>'08:00:00', 'end'=>'18:00:00', 'break'=>60]);
+    Schedule::create(['user_id'=>1, 'day'=>5, 'begin'=>'08:00:00', 'end'=>'16:00:00', 'break'=>60]);
+    Schedule::create(['user_id'=>1, 'day'=>6]);
+    Schedule::create(['user_id'=>1, 'day'=>7]);
+
 });
 
 Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/test', function () {
     $day = 1;
@@ -52,12 +58,18 @@ Route::get('/test', function () {
     return $date;
 });
 
-
+Route::get('/user/settings/{id}/create', 'UserController@createSettings')->name('user.settings.create');
+Route::put('/user/settings/{id}/update', 'UserController@updateSettings')->name('user.settings.update');
 Route::resource('/user', 'UserController');
-Route::resource('/schedule', 'ScheduleController');
+Route::get('/schedule/create/{id}', 'ScheduleController@create')->name('schedule.create');
+Route::resource('/schedule', 'ScheduleController')->except(['create']);
 
+Route::get('/entries/{id}/init', 'EntryController@initShow')->name('entries.init.show');
+Route::post('/entries/{id}/init/set', 'EntryController@initSet')->name('entries.init.set');
+Route::resource('/entries', 'EntryController');
 
 Route::get('/start', function () {
     return view('user.home');
 })->name('start');
-Route::get('/enter/{identifier}', 'EntryController@enter');
+
+

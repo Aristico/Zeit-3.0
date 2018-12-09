@@ -2,8 +2,6 @@
 
 @section('content')
 
-    @include('includes.success')
-
     <h1>Zeitplan anlegen</h1>
     <br>
     <!-- bei Action den Controller und die Methode eintrage z.B. UserController@Create -->
@@ -21,7 +19,7 @@
                         <p>{{$days[$default->day]}}</p>
                     </div>
                     <input type="hidden" name="day[{{$default->day}}][day]" value="{{$default->day}}">
-                    <input type="hidden" name="day[{{$default->day}}][user_id]" value="{{isset($userid) ? $userid : '9999999'}}">
+                    <input type="hidden" name="day[{{$default->day}}][user_id]" value="{{$id}}">
 
                     <div class="form-group col-sm-4">
                        {!! Form::label('day[' . $default->day . '][begin]', 'Beginn:', ['class'=>'sr-only']) !!}
@@ -38,6 +36,8 @@
                 </div>
             @endforeach
         @endif
+
+        @include('includes.message')
 
         <div class="form-group">
            {!! Form::submit('Anlegen', ['class'=>'btn btn-primary'] ) !!}

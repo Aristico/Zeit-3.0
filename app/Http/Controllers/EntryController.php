@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use DateTime;
 use Illuminate\Http\Request;
 
 class EntryController extends Controller
 {
+
+
+
     /**
      * Display a listing of the resource.
      *
@@ -14,6 +19,26 @@ class EntryController extends Controller
     public function index()
     {
         //
+    }
+
+    public function initShow ($id)
+    {
+        return view('admin.entrys.init', compact('id'));
+
+    }
+
+    public function initSet (Request $request, $id)
+    {
+        $date = new DateTime('now');
+        $input = $request->all('balance');
+        $input['date'] = $date->modify('-1 day')->format('Y-m-d');
+        $input['comment'] = 'Start';
+
+        $user = User::findOrFail($id);
+        $user->entries()->create($input);
+
+        return redirect(route('start'));
+
     }
 
     /**

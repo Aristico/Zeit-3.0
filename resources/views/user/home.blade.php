@@ -2,7 +2,7 @@
 
 @section('content')
 
-@include('includes.success')
+@include('includes.message')
 
 
 @endsection

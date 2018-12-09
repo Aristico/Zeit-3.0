@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DateTime;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'email',
         'identifier',
         'password',
+        'start_balance'
     ];
 
     /**
@@ -52,8 +54,28 @@ class User extends Authenticatable
 
     public function currentSchedule () {
 
+        /* Ermittelt den Aktuellen Zeit-Plan. Bez. den neuesten.
+         * Ist schon eine Änderung in dieser Woche erfolgt und somit für den nächsten Montag ein neuer Zeit-Plan
+         * geplant, wird dieser ermittelt.
+         * */
+
         $lastversion = $this->schedules()->orderBy('version', 'desc')->first();
         return $this->schedules()->where('version', '=', $lastversion->version)->get();
+
+    }
+
+    public function currentHours () {
+
+        $currentversion = $this->schedules()->where('valid_from', '<', new DateTime())->orderBy('version', 'desc')->first();
+        $schedule = $this->schedules()->where('version', '=', $currentversion->version)->get();
+
+        $hours = 0;
+
+        foreach ($schedule as $day) {
+            $hours += $day->regularHours();
+        }
+
+        return $hours;
 
     }
 }

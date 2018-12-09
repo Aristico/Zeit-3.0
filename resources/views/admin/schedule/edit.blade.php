@@ -2,8 +2,6 @@
 
 @section('content')
 
-    @include('includes.success')
-
     <h1>Zeitplan Bearbeiten</h1>
     <br>
     <!-- bei Action den Controller und die Methode eintrage z.B. UserController@Create -->
@@ -40,8 +38,10 @@
             @endforeach
         @endif
 
+        @include('includes.message')
+
         @if(session('success'))
-           <button class="btn btn-primary" value="true" name="ready">Fertig</button>
+           <button class="btn btn-primary" value="true" name="ready">Speichern</button>
            <button class="btn btn-secondary" value="false" name="ready">Ändern</button>
         @else
            <button class="btn btn-primary" value="false" name="ready">Ändern</button>

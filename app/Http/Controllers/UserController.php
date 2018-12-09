@@ -46,7 +46,7 @@ class UserController extends Controller
 
         session()->flash('success_message', 'Der Benutzer wurde angelegt.');
 
-        return redirect()->action('ScheduleController@create', ['id'=>$success->id]);
+        return redirect()->action('ScheduleController@create', $success->id);
     }
 
     /**
@@ -106,6 +106,22 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    public function createSettings($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.users.settings', compact('user'));
+
+    }
+
+    public function updateSettings(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $result = $user->update($request->all());
+        redirect(route('start'));
+
+    }
+
     public function destroy($id)
     {
         //
