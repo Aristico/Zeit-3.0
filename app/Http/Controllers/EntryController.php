@@ -41,6 +41,68 @@ class EntryController extends Controller
 
     }
 
+    public function enter($identifier) {
+
+        /*Ruft die aktuelle Zeit ab und den Benutzer, der zum identifier gehört*/
+        $now = new DateTime('now');
+        $user = User::where('identifier', '=', $identifier)->firstOrFail();
+
+        /*Prüft ob bereits ein Eintrag existiert*/
+        if(count($user->entries()->where('date', $now->format('Y-m-d'))->get())>0){
+            return 'Es exitiert bereits ein Eintrag';
+        } else {
+            /*Es werden Die Daten des Tages eingetragen */
+            $user->entries()->create([
+                'date'=>$now->format('Y-m-d'), /*Datum von Heute*/
+                'begin'=>$now->format('H:i:s'), /*Aktuelle Uhrzeit*/
+                'break'=>$user->currentScheduleToday()['break'] == null ? 0 : $user->currentScheduleToday()['break'], /*Die Pause aus dem Zeitplan*/
+                'schedule_version'=>$user->currentScheduleToday()['version'], /*Die aktuelle Version*/
+                'regular_hours'=>$user->currentScheduleToday()->regularHours() /*Die geplante Arbeitszeit*/
+            ]);
+            return 'Es wurde ein Eintrag angelegt';
+        }
+    }
+
+    public function leave($identifier) {
+
+        /*Ruft die aktuelle Zeit ab und den Benutzer, der zum identifier gehört*/
+        $now = new DateTime('now');
+        $user = User::where('identifier', '=', $identifier)->firstOrFail();
+
+        /*Prüft ob bereits ein Eintrag existiert*/
+        if(count($user->entries()->where('date', $now->format('Y-m-d'))->get())>0){
+            /*Ländt den letzten Eintrag für den Überstundensaldo*/
+            $last_entry = $user->entries()->orderBy('date', 'DESC')->where('date','<', $now->format('Y-m-d'))->first();
+
+            /*Lädt den aktuellen Eintrag*/
+            $entry = $user->entries()->where('date', $now->format('Y-m-d'))->firstOrFail();
+
+            /*Berechnet die aktuelle Arbeitszeit, die Überstunden und den Überstundensaldo*/
+            $actualHours = $entry->calculateHours($entry->begin, $now->format('H:i:s'), $entry->break);
+            $overtime = $actualHours - $entry->regular_hours;
+            $balance = $last_entry['balance']+$overtime;
+
+            /*Schreibt die Daten in die Datenbank*/
+            $entry->update([
+                'end' => $now->format('H:i:s'),
+                'actual_hours'=>$actualHours,
+                'overtime'=>$overtime,
+                'balance'=>$balance
+            ]);
+        } else {
+            /*Es werden Die Daten des Tages eingetragen */
+            $user->entries()->create([
+                'date'=>$now->format('Y-m-d'), /*Datum von Heute*/
+                'begin'=>$now->format('H:i:s'), /*Aktuelle Uhrzeit*/
+                'end'=>$now->format('H:i:s'), /*Aktuelle Uhrzeit*/
+                'break'=>$user->currentScheduleToday()['break'] == null ? 0 : $user->currentScheduleToday()['break'], /*Die Pause aus dem Zeitplan*/
+                'schedule_version'=>$user->currentScheduleToday()['version'], /*Die aktuelle Version*/
+                'regular_hours'=>$user->currentScheduleToday()->regularHours() /*Die geplante Arbeitszeit*/
+            ]);
+            return 'Es exitierte noch kein eintrag und es wurde einer angelegt';
+        }
+    }
+
     /**
      * Show the form for creating a new resource.
      *

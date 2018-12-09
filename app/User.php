@@ -64,6 +64,14 @@ class User extends Authenticatable
 
     }
 
+    public function currentScheduleToday() {
+
+        $now = new DateTime('now');
+        $schedule = $this->currentSchedule()->where('day', $now->format('N'))->first();
+        return $schedule;
+
+    }
+
     public function currentHours () {
 
         $currentversion = $this->schedules()->where('valid_from', '<', new DateTime())->orderBy('version', 'desc')->first();

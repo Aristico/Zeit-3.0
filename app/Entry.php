@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Entry extends Model
@@ -13,10 +14,20 @@ class Entry extends Model
         'begin',
         'end',
         'break',
-        'balance',
         'regular_hours',
+        'actual_hours',
+        'overtime',
+        'balance',
         'schedule_version',
         'comment'
     ];
+
+    public function calculateHours($start, $end, $break) {
+
+        $begin = new Carbon($start);
+        $difference = round((($begin->diffInSeconds(new Carbon($end)) - $break*60)/60/60)*4)/4;
+        return $difference;
+
+    }
 
 }

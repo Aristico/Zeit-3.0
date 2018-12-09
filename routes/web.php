@@ -66,6 +66,9 @@ Route::resource('/schedule', 'ScheduleController')->except(['create']);
 
 Route::get('/entries/{id}/init', 'EntryController@initShow')->name('entries.init.show');
 Route::post('/entries/{id}/init/set', 'EntryController@initSet')->name('entries.init.set');
+Route::get('/entries/{identifier}/enter', 'EntryController@enter')->name('entries.enter');
+Route::get('/entries/{identifier}/leave', 'EntryController@leave')->name('entries.leave');
+
 Route::resource('/entries', 'EntryController');
 
 Route::get('/start', function () {
