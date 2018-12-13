@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EntryController extends Controller
 {
@@ -18,7 +20,18 @@ class EntryController extends Controller
      */
     public function index()
     {
-        //
+
+        if (Auth::check()) {
+
+            $entries = Auth::user()->entries()->get();
+            return view('admin.entrys.index', compact('entries'));
+
+        } else {
+
+            return "Es ist kein User angemeldet!";
+
+        }
+
     }
 
     public function initShow ($id)
@@ -44,9 +57,8 @@ class EntryController extends Controller
     public function enter($identifier) {
 
         /*Ruft die aktuelle Zeit ab und den Benutzer, der zum identifier gehört*/
-        $now = new DateTime('now');
+        $now = Carbon::now('Europe/Berlin');
         $user = User::where('identifier', '=', $identifier)->firstOrFail();
-
         /*Prüft ob bereits ein Eintrag existiert*/
         if(count($user->entries()->where('date', $now->format('Y-m-d'))->get())>0){
             return 'Es exitiert bereits ein Eintrag';
@@ -66,7 +78,7 @@ class EntryController extends Controller
     public function leave($identifier) {
 
         /*Ruft die aktuelle Zeit ab und den Benutzer, der zum identifier gehört*/
-        $now = new DateTime('now');
+        $now = Carbon::now('Europe/Berlin');
         $user = User::where('identifier', '=', $identifier)->firstOrFail();
 
         /*Prüft ob bereits ein Eintrag existiert*/

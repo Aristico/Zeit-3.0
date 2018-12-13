@@ -72,6 +72,7 @@ Route::get('/entries/{identifier}/leave', 'EntryController@leave')->name('entrie
 Route::resource('/entries', 'EntryController');
 
 Route::get('/start', function () {
+
     return view('user.home');
 })->name('start');
 
