@@ -58,6 +58,9 @@ class EntryController extends Controller
 
         /*Ruft die aktuelle Zeit ab und den Benutzer, der zum identifier gehört*/
         $now = Carbon::now('Europe/Berlin');
+
+        dd($now);
+
         $user = User::where('identifier', '=', $identifier)->firstOrFail();
         /*Prüft ob bereits ein Eintrag existiert*/
         if(count($user->entries()->where('date', $now->format('Y-m-d'))->get())>0){
