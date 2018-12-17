@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entry;
 use App\User;
 use Carbon\Carbon;
 use DateTime;
@@ -23,7 +24,7 @@ class EntryController extends Controller
 
         if (Auth::check()) {
 
-            $entries = Auth::user()->entries()->get();
+            $entries = Auth::user()->entries()->orderBy('date', 'asc')->where([['begin','<>', null], ['end','<>',null]])->get();
             return view('admin.entrys.index', compact('entries'));
 
         } else {
@@ -55,6 +56,7 @@ class EntryController extends Controller
     }
 
     public function enter($identifier) {
+
 
         /*Ruft die aktuelle Zeit ab und den Benutzer, der zum identifier gehört*/
         $user = User::where('identifier', '=', $identifier)->firstOrFail();
@@ -110,7 +112,7 @@ class EntryController extends Controller
                 'schedule_version'=>$user->currentScheduleToday()['version'], /*Die aktuelle Version*/
                 'regular_hours'=>$user->currentScheduleToday()->regularHours() /*Die geplante Arbeitszeit*/
             ]);
-            return 'Es exitierte noch kein eintrag und es wurde einer angelegt';
+            return 'Es exitierte noch kein Eintrag und es wurde einer angelegt';
         }
     }
 
@@ -154,7 +156,8 @@ class EntryController extends Controller
      */
     public function edit($id)
     {
-        //
+        $entry = Entry::findOrFail($id);
+        return view('admin.entrys.edit', compact('entry'));
     }
 
     /**
@@ -166,7 +169,47 @@ class EntryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $input = $request->all();
+
+        if ($input['command']=='save') {
+
+            $entry = Entry::findOrFail($id);
+
+            /*Berechnet die werte auf Basis der eingegebenen Daten*/
+            $input['actual_hours'] = $entry->calculateHours($input['begin'], $input['end'], $input['break']);
+            $input['overtime'] = $input['actual_hours'] - $entry->regular_hours;
+            $entry->update($input);
+
+            $lastEntry = Entry::where([['user_id', $entry->user_id], ['date', '<', $entry->date]])->orderBy('date', 'desc')->first();
+
+            $entries = Entry::where('date', '>', $lastEntry->date)->where('user_id', $entry->user_id)->orderBy('date', 'asc')->get();
+
+            $balance = $lastEntry->balance;
+
+            foreach ($entries as $row) {
+                $balance = $balance + $row->overtime;
+                Entry::findOrFail($row->id)->update(['balance'=>$balance]);
+            }
+
+        return redirect(route('entries.index'));
+
+        }  elseif ($input['command'] == 'delete') {
+
+            return redirect(route('entries.delete', $id));
+
+        } else {
+
+            return redirect(route('entries.index'));
+
+        }
+
+    }
+
+    public function delete($id) {
+
+        $entry = Entry::findOrFail($id);
+        return view('admin.entrys.delete', compact('entry'));
+
     }
 
     /**
@@ -175,8 +218,34 @@ class EntryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $input = $request->all();
+
+        if($input['command'] = 'yes') {
+
+            $entry = Entry::findOrFail($id);
+
+            $lastEntry = Entry::where([['user_id', $entry->user_id], ['date', '<', $entry->date]])->orderBy('date', 'desc')->first();
+
+            $entry->delete();
+
+            $balance = $lastEntry->balance;
+
+            $entries = Entry::where([['date', '>', $lastEntry->date], ['user_id', $lastEntry->user_id]])->orderBy('date', 'asc')->get();
+
+            foreach ($entries as $row) {
+                $balance = $balance + $row->overtime;
+                Entry::findOrFail($row->id)->update(['balance' => $balance]);
+            }
+
+            return redirect(route('entries.index'));
+
+        } else {
+
+            return redirect(route('entries.index'));
+
+        }
+
     }
 }

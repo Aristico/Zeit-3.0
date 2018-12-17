@@ -30,4 +30,22 @@ class Entry extends Model
 
     }
 
+    public function dateCarbon() {
+
+        return new Carbon($this->date);
+
+    }
+
+    public function beginCarbon() {
+
+        return new Carbon($this->date . ' ' . $this->begin);
+
+    }
+
+    public function endCarbon() {
+
+        return new Carbon($this->date . ' ' . $this->end);
+
+    }
+
 }
