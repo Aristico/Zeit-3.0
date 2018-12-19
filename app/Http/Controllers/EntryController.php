@@ -24,7 +24,28 @@ class EntryController extends Controller
 
         if (Auth::check()) {
 
-            $entries = Auth::user()->entries()->orderBy('date', 'asc')->where([['begin','<>', null], ['end','<>',null]])->get();
+            $entriesBase = Auth::user()->entries()->orderBy('date', 'asc')->where([['begin','<>', null], ['end','<>',null]])->get();
+
+            $date = new Carbon($entriesBase->first()->dateCarbon()->format('Y-m-01'));
+
+            while ($date->format('Y-m-d') <= date('Y-m-d')) {
+
+                if(count($entriesBase->where('date', $date->format('Y-m-d'))->all())==0) {
+
+                    $newEntry = new Entry;
+                    $newEntry->date = $date->format('Y-m-d');
+                    $newEntry->user_id = $entriesBase->first()->user_id;
+                    $newEntry->comment = 'no Entry';
+                    $entriesBase->push($newEntry);
+
+
+                }
+
+                $date->addDay();
+
+            }
+
+            $entries = $entriesBase->sortBy('date');
             return view('admin.entrys.index', compact('entries'));
 
         } else {
@@ -43,12 +64,12 @@ class EntryController extends Controller
 
     public function initSet (Request $request, $id)
     {
-        $date = new Carbon(date('Y-m-d H:i:s'));
+        $date = new Carbon(date('Y-01-01 00:00:00'));
         $input = $request->all('balance');
-        $input['date'] = $date->modify('-1 day')->format('Y-m-d');
+        $input['date'] = $date->format('Y-m-d');
         $input['comment'] = 'Start';
 
-        $user = User::findOrFail($id);
+        $user = User::findOrFax^il($id);
         $user->entries()->create($input);
 
         return redirect(route('start'));
@@ -121,9 +142,10 @@ class EntryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($user_id, $date)
     {
-        //
+        $schedule = User::findOrFail($user_id)->scheduleByDate($date);
+        return view('admin.entrys.create', compact('date', 'schedule'));
     }
 
     /**
@@ -134,8 +156,34 @@ class EntryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $input = $request->all();
+
+        $entry = Entry::create($input);
+
+        $actual_hours = $entry->calculateHours($request->begin, $request->end, $request->break);
+        $overtime = $actual_hours - $entry->regular_hours;
+
+        $entry->update([
+            'actual_hours'=>$actual_hours,
+            'overtime'=>$overtime
+        ]);
+
+        $lastEntry = Entry::where([['user_id', $entry->user_id], ['date', '<', $entry->date]])->orderBy('date', 'desc')->first();
+
+        $entries = Entry::where('date', '>', $lastEntry->date)->where('user_id', $entry->user_id)->orderBy('date', 'asc')->get();
+
+        $balance = $lastEntry->balance;
+
+        foreach ($entries as $row) {
+            $balance = $balance + $row->overtime;
+            Entry::findOrFail($row->id)->update(['balance'=>$balance]);
+        }
+
+        return redirect(route('entries.index'));
+
+
     }
+
 
     /**
      * Display the specified resource.

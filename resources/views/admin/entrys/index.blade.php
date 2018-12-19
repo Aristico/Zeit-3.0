@@ -16,14 +16,22 @@
         </thead>
         <tbody>
             @foreach($entries as $entry)
-                <tr>
+                <tr class="
+                    @if($entry->comment == 'no Entry')
+                        {{'alert alert-warning'}}
+                    @endif
+                ">
                     <td>{{$entry->dateCarbon()->format('d.m.Y')}}</td>
-                    <td>{{$entry->beginCarbon()->format('H:i') . ' - ' . $entry->endCarbon()->format('H:i') . ' Uhr'}}  </td>
-                    <td>{{$entry->break}}</td>
-                    <td>{{$entry->actual_hours}} ({{$entry->regular_hours}})</td>
-                    <td>{{$entry->overtime}}</td>
-                    <td>{{$entry->balance}}</td>
-                    <td><a href="{{route('entries.edit', $entry->id)}}">Bearbeiten</a></td>
+                    <td>@if($entry->comment != 'no Entry'){{$entry->beginCarbon()->format('H:i') . ' - ' . $entry->endCarbon()->format('H:i') . ' Uhr'}}@endif</td>
+                    <td>@if($entry->comment != 'no Entry'){{$entry->break}}@endif</td>
+                    <td>@if($entry->comment != 'no Entry'){{$entry->actual_hours}} ({{$entry->regular_hours}})@endif</td>
+                    <td>@if($entry->comment != 'no Entry'){{$entry->overtime}}@endif</td>
+                    <td>@if($entry->comment != 'no Entry'){{$entry->balance}}@endif</td>
+                    <td>@if($entry->comment != 'no Entry')
+                            <a href="{{route('entries.edit', $entry->id)}}">Bearbeiten</a>
+                        @else
+                            <a href="{{route('entries.create', ['user_id'=>$entry->user_id, 'date'=>$entry->date])}}">Erstellen</a>
+                        @endif</td>
                 </tr>
             @endforeach
         </tbody>

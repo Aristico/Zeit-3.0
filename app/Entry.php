@@ -44,7 +44,7 @@ class Entry extends Model
 
     public function endCarbon() {
 
-        return new Carbon($this->date . ' ' . $this->end);
+        return new Carbon($this->date . ' ' .$this->end);
 
     }
 

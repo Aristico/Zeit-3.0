@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -68,6 +69,14 @@ class User extends Authenticatable
 
         $now = new DateTime('now');
         $schedule = $this->currentSchedule()->where('day', $now->format('N'))->first();
+        return $schedule;
+
+    }
+
+    public function scheduleByDate($date) {
+
+        $day = new Carbon($date);
+        $schedule = $this->schedules()->where([['day', $day->format('N')],['valid_from','<=','date']])->first();
         return $schedule;
 
     }
