@@ -15,6 +15,7 @@ use App\Role;
 use App\Schedule;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 Route::get('/', function () {
     return view('welcome');
@@ -53,9 +54,7 @@ route::get('/init', function () {
 Auth::routes();
 
 Route::get('/test', function () {
-    $day = 1;
-    $date = new carbon($day . ' Day of Week');
-    return $date;
+ dd(Hash::check('123', '$2y$10$jLTuVhJLSwg3d3XcTRoY2.B5kAWu0dy1Z7.TKFONGwnozfRFYwts2'));
 });
 
 Route::get('/user/settings/{id}/create', 'UserController@createSettings')->name('user.settings.create');

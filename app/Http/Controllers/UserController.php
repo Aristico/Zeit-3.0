@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -39,12 +40,12 @@ class UserController extends Controller
     {
 
         $input = $request->all();
-        $input['password'] = bcrypt($request->pasword);
+        $input['password'] = Hash::make($request->pasword);
         $input['identifier'] = md5($request->email);
 
         $success = User::create($input);
 
-        session()->flash('success_message', 'Der Benutzer wurde angelegt.');
+        session()->flash('success_message', 'Der Benutzer wurde angelegt.' . $input['password']);
 
         return redirect()->action('ScheduleController@create', $success->id);
     }

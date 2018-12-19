@@ -69,7 +69,7 @@ class EntryController extends Controller
         $input['date'] = $date->format('Y-m-d');
         $input['comment'] = 'Start';
 
-        $user = User::findOrFax^il($id);
+        $user = User::findOrFail($id);
         $user->entries()->create($input);
 
         return redirect(route('start'));
