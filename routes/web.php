@@ -53,8 +53,15 @@ route::get('/init', function () {
 
 Auth::routes();
 
+
 Route::get('/test', function () {
- dd(Hash::check('123', '$2y$10$jLTuVhJLSwg3d3XcTRoY2.B5kAWu0dy1Z7.TKFONGwnozfRFYwts2'));
+
+    $password = 'hallo';
+    $hashed = bcrypt($password);
+
+    //dd(Hash::check($password, $hashed));
+
+    dd($hashed);
 });
 
 Route::get('/user/settings/{id}/create', 'UserController@createSettings')->name('user.settings.create');

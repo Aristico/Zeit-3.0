@@ -40,12 +40,12 @@ class UserController extends Controller
     {
 
         $input = $request->all();
-        $input['password'] = Hash::make($request->pasword);
+        $input['password'] = bcrypt($request->password);
         $input['identifier'] = md5($request->email);
 
         $success = User::create($input);
 
-        session()->flash('success_message', 'Der Benutzer wurde angelegt.' . $input['password']);
+        session()->flash('success_message', 'Der Benutzer wurde angelegt.');
 
         return redirect()->action('ScheduleController@create', $success->id);
     }
