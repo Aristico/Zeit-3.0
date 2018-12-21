@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Entry;
 use App\Schedule;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Prophecy\Doubler\ClassPatch\MagicCallPatch;
 
 /* In der Tabelle Entries werden die Einträge zu den geleisteten Arbeitszeiteen
@@ -19,28 +20,31 @@ use Prophecy\Doubler\ClassPatch\MagicCallPatch;
 
 class ScheduleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($id)
+    public function create()
     {
-        /*Lädt die Standard-Arbeitszeiten und üerzeut ein Array mit den enthaltenen Tagen.*/
-        $defaults = Schedule::where('user_id', 0)->get();
-        $days = [1=>'Montag', 2=>'Dienstag', 3=>'Mittwoch', 4=>'Donnerstag', 5=>'Freitag', 6=>'Samstag', 7=>'Sonntag'];
-        /*Zeigt das mit den Standardzeiten Vorausgefüllte Formular.*/
-        return view('admin.schedule.create', compact('days', 'defaults', 'id'));
+        if (isset(Auth::User()->id)) {
+            $id = Auth::User()->id;
+        }
+
+        if(count(Schedule::where('user_id', $id)->get()) > 0) {
+
+            return redirect(route('schedule.edit'));
+
+        } else {
+
+            /*Lädt die Standard-Arbeitszeiten und üerzeut ein Array mit den enthaltenen Tagen.*/
+            $defaults = Schedule::where('user_id', 0)->get();
+            $days = [1 => 'Montag', 2 => 'Dienstag', 3 => 'Mittwoch', 4 => 'Donnerstag', 5 => 'Freitag', 6 => 'Samstag', 7 => 'Sonntag'];
+            /*Zeigt das mit den Standardzeiten Vorausgefüllte Formular.*/
+            return view('admin.schedule.create', compact('days', 'defaults', 'id'));
+
+        }
     }
 
     /**
@@ -75,19 +79,8 @@ class ScheduleController extends Controller
         /* Als nächstes wird das Edit-Fenster angezeigt.
          * Hier wird die berechnete Arbeitszeit ausgewiesen und kann ggf. nochmal geändert werden.
          * */
-        return redirect(route('schedule.edit', $schedule->user_id));
+        return redirect(route('schedule.edit'));
 
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
     }
 
     /**
@@ -96,13 +89,13 @@ class ScheduleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit()
     {
         /* Zeigt das Bearbeiten Formular und füllt es mit den Werten aus der Datenbank aus.
          * */
-        $schedule = User::findOrFail($id)->currentSchedule();
+        $schedule = Auth::User()->currentSchedule();
         $days = [1=>'Montag', 2=>'Dienstag', 3=>'Mittwoch', 4=>'Donnerstag', 5=>'Freitag', 6=>'Samstag', 7=>'Sonntag'];
-        return view('admin.schedule.edit', compact('days', 'schedule', 'id'));
+        return view('admin.schedule.edit', compact('days', 'schedule'));
 
     //'user_id', '=', $id
 
@@ -115,8 +108,10 @@ class ScheduleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
+
+        $id = Auth::User()->id;
 
         /* Die Fertig Schaltfläche ersheint nur, wenn die Seite ein-Mal abgesendet wurde
          * Wenn die Fertig Schaltfläche gedrückt wird, dann leite Weiter an Home
@@ -125,7 +120,14 @@ class ScheduleController extends Controller
 
         if($request->ready == "true") {
 
-            return redirect(route('entries.init.show', $id));
+            if(count(Entry::where('user_id', $id)->get()) > 0) {
+
+                return redirect(route('start'));
+
+            } else {
+
+                return redirect(route('entries.init.show'));
+            }
 
         } else {
 
@@ -144,7 +146,7 @@ class ScheduleController extends Controller
             /* Existiert schon eine Geänderte Version in der Zukunft, dann wird diese gelöscht.
              * */
 
-            User::findOrFail($id)->schedules()->where('valid_from', '=', $date)->delete();
+            Auth::User()->schedules()->where('valid_from', '=', $date)->delete();
 
 
             /* Speichert die Daten in der Datenbank. Die Version wird um eins erhöht.
@@ -170,7 +172,7 @@ class ScheduleController extends Controller
             /* Zeigt nochmal die Bearbeiten Seite an um sie zu bestätigen oder nochmal ändern zu können.
              * */
 
-            return redirect(route('schedule.edit', $schedule->user_id));
+            return redirect(route('schedule.edit'));
 
         }
 
@@ -184,8 +186,8 @@ class ScheduleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        //
-    }
+//    public function destroy($id)
+//    {
+//        //
+//    }
 }

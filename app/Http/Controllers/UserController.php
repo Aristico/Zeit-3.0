@@ -4,10 +4,16 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth')->except(['create', 'store']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -43,11 +49,30 @@ class UserController extends Controller
         $input['password'] = bcrypt($request->password);
         $input['identifier'] = md5($request->email);
 
-        $success = User::create($input);
+
+        try {
+
+            $success = User::create($input);
+
+        } catch (\Exception $e) { // I don't remember what exception it is specifically
+
+            session()->flash('error_message', 'Bei der Benutzeranlage ist ein Fehler aufgetreten.');
+            return redirect()->back();
+
+        }
 
         session()->flash('success_message', 'Der Benutzer wurde angelegt.');
 
-        return redirect()->action('ScheduleController@create', $success->id);
+        if (Auth::loginUsingId($success->id)) {
+            // Authentication passed...
+            return redirect(route('schedule.create'));
+            } else {
+
+            session()->flash('error_message', 'Bei der Benutzeranlage ist ein Fehler aufgetreten. Der Anlageprozess konnte nicht fortgesetzt werden.');
+            return redirect()->back();
+
+        }
+
     }
 
     /**
@@ -98,30 +123,10 @@ class UserController extends Controller
 
         $user->update($input);
 
-        return $user;
+        return redirect(route('start'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
 
-    public function createSettings($id)
-    {
-        $user = User::findOrFail($id);
-        return view('admin.users.settings', compact('user'));
-
-    }
-
-    public function updateSettings(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-        $result = $user->update($request->all());
-        redirect(route('start'));
-
-    }
 
     public function destroy($id)
     {

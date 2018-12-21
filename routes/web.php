@@ -49,6 +49,9 @@ route::get('/init', function () {
     Schedule::create(['user_id'=>1, 'day'=>6]);
     Schedule::create(['user_id'=>1, 'day'=>7]);
 
+    Entry::create(['user_id'=>1, 'date'=>'2018-01-01', 'break'=>0, 'regular_hours'=>0,
+                   'balance'=>0, 'schedule_version'=>1, 'comment'=>'Start']);
+
 });
 
 Auth::routes();
@@ -64,20 +67,27 @@ Route::get('/test', function () {
     dd($hashed);
 });
 
-Route::get('/user/settings/{id}/create', 'UserController@createSettings')->name('user.settings.create');
-Route::put('/user/settings/{id}/update', 'UserController@updateSettings')->name('user.settings.update');
-Route::resource('/user', 'UserController');
-Route::get('/schedule/create/{id}', 'ScheduleController@create')->name('schedule.create');
-Route::resource('/schedule', 'ScheduleController')->except(['create']);
 
-Route::get('/entries/{id}/init', 'EntryController@initShow')->name('entries.init.show');
-Route::post('/entries/{id}/init/set', 'EntryController@initSet')->name('entries.init.set');
-Route::get('/entries/{id}/delete', 'EntryController@delete')->name('entries.delete');
-Route::get('/entries/{user_id}/{date}/create', 'EntryController@create')->name('entries.create');
+Route::resource('/user', 'UserController');
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::put('/schedule/update', 'ScheduleController@update')->name('schedule.update');
+    Route::get('/schedule/edit', 'ScheduleController@edit')->name('schedule.edit');
+    Route::resource('/schedule', 'ScheduleController')->except(['update', 'edit']);
+
+    Route::get('/entries/init', 'EntryController@initShow')->name('entries.init.show');
+    Route::post('/entries/init/set', 'EntryController@initSet')->name('entries.init.set');
+    Route::get('/entries/{id}/delete', 'EntryController@delete')->name('entries.delete');
+    Route::get('/entries/{date}/create', 'EntryController@create')->name('entries.create');
+
+    Route::resource('/entries', 'EntryController')->except('create');
+
+
+});
+
 Route::get('/entries/{identifier}/enter', 'EntryController@enter')->name('entries.enter');
 Route::get('/entries/{identifier}/leave', 'EntryController@leave')->name('entries.leave');
-
-Route::resource('/entries', 'EntryController')->except('create');
 
 Route::get('/start', function () {
 

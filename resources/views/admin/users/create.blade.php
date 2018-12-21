@@ -23,6 +23,9 @@
            {!! Form::label('password', 'Passwort') !!}
            {!! Form::password('password', ['title'=>'password', 'class'=>'form-control'] ) !!}
         </div>
+
+        @include('includes.message')
+
         <div class="form-group">
            {!! Form::submit('Anlegen', ['class'=>'btn btn-primary'] ) !!}
         </div>

@@ -30,7 +30,7 @@
                     <td>@if($entry->comment != 'no Entry')
                             <a href="{{route('entries.edit', $entry->id)}}">Bearbeiten</a>
                         @else
-                            <a href="{{route('entries.create', ['user_id'=>$entry->user_id, 'date'=>$entry->date])}}">Erstellen</a>
+                            <a href="{{route('entries.create', ['date'=>$entry->date])}}">Erstellen</a>
                         @endif</td>
                 </tr>
             @endforeach

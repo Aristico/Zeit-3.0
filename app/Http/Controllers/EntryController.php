@@ -46,7 +46,7 @@ class EntryController extends Controller
             }
 
             $entries = $entriesBase->sortBy('date');
-            return view('admin.entrys.index', compact('entries'));
+            return view('admin.entries.index', compact('entries'));
 
         } else {
 
@@ -56,20 +56,30 @@ class EntryController extends Controller
 
     }
 
-    public function initShow ($id)
+    public function initShow ()
     {
-        return view('admin.entrys.init', compact('id'));
+
+        $id = Auth::User()->id;
+
+        if(count(Entry::where('user_id', $id)->get()) > 0) {
+
+            return redirect(route('start'));
+
+        } else {
+
+            return view('admin.entries.init', compact('id'));
+        }
 
     }
 
-    public function initSet (Request $request, $id)
+    public function initSet (Request $request)
     {
         $date = new Carbon(date('Y-01-01 00:00:00'));
         $input = $request->all('balance');
         $input['date'] = $date->format('Y-m-d');
         $input['comment'] = 'Start';
 
-        $user = User::findOrFail($id);
+        $user = Auth::User();
         $user->entries()->create($input);
 
         return redirect(route('start'));
@@ -142,10 +152,10 @@ class EntryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($user_id, $date)
+    public function create($date)
     {
-        $schedule = User::findOrFail($user_id)->scheduleByDate($date);
-        return view('admin.entrys.create', compact('date', 'schedule'));
+        $schedule = Auth::User()->scheduleByDate($date);
+        return view('admin.entries.create', compact('date', 'schedule'));
     }
 
     /**
@@ -205,7 +215,7 @@ class EntryController extends Controller
     public function edit($id)
     {
         $entry = Entry::findOrFail($id);
-        return view('admin.entrys.edit', compact('entry'));
+        return view('admin.entries.edit', compact('entry'));
     }
 
     /**
@@ -256,7 +266,7 @@ class EntryController extends Controller
     public function delete($id) {
 
         $entry = Entry::findOrFail($id);
-        return view('admin.entrys.delete', compact('entry'));
+        return view('admin.entries.delete', compact('entry'));
 
     }
 

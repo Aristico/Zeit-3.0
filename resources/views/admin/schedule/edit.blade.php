@@ -5,7 +5,7 @@
     <h1>Zeitplan Bearbeiten</h1>
     <br>
     <!-- bei Action den Controller und die Methode eintrage z.B. UserController@Create -->
-    {!! Form::open(['action'=>['ScheduleController@update', $id], 'method' => 'put']) !!}
+    {!! Form::open(['action'=>['ScheduleController@update'], 'method' => 'put']) !!}
         {{csrf_field()}}
         <div class="row">
             <p class="col-sm-4 offset-2">Anfang</p>
