@@ -15,11 +15,11 @@ class CreateEntriesTable extends Migration
     {
         Schema::create('entries', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
+            $table->integer('user_id')->unsigned()->index();
             $table->date('date')->index();
             $table->time('begin')->nullable();
             $table->time('end')->nullable();
-            $table->decimal('break', 8,2)->default(0);
+            $table->integer('break')->default(0);
             $table->decimal('regular_hours', 8,2)->default(0);
             $table->decimal('actual_hours', 8,2)->nullable();
             $table->decimal('overtime', 8,2)->nullable();
@@ -27,6 +27,9 @@ class CreateEntriesTable extends Migration
             $table->integer('schedule_version')->default(1);
             $table->string('comment')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
         });
     }
 

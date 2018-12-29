@@ -39,10 +39,10 @@ class ScheduleController extends Controller
         } else {
 
             /*Lädt die Standard-Arbeitszeiten und üerzeut ein Array mit den enthaltenen Tagen.*/
-            $defaults = Schedule::where('user_id', 0)->get();
+            $defaults = Schedule::where('user_id', 1)->get();
             $days = [1 => 'Montag', 2 => 'Dienstag', 3 => 'Mittwoch', 4 => 'Donnerstag', 5 => 'Freitag', 6 => 'Samstag', 7 => 'Sonntag'];
             /*Zeigt das mit den Standardzeiten Vorausgefüllte Formular.*/
-            return view('admin.schedule.create', compact('days', 'defaults', 'id'));
+            return view('user.schedule.create', compact('days', 'defaults', 'id'));
 
         }
     }
@@ -95,7 +95,7 @@ class ScheduleController extends Controller
          * */
         $schedule = Auth::User()->currentSchedule();
         $days = [1=>'Montag', 2=>'Dienstag', 3=>'Mittwoch', 4=>'Donnerstag', 5=>'Freitag', 6=>'Samstag', 7=>'Sonntag'];
-        return view('admin.schedule.edit', compact('days', 'schedule'));
+        return view('user.schedule.edit', compact('days', 'schedule'));
 
     //'user_id', '=', $id
 

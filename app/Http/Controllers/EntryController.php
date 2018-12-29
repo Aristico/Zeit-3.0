@@ -19,40 +19,95 @@ class EntryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($year = null, $month = null)
     {
 
-        if (Auth::check()) {
+            if ($year == null && $month == null){
 
-            $entriesBase = Auth::user()->entries()->orderBy('date', 'asc')->where([['begin','<>', null], ['end','<>',null]])->get();
+                /*Es wird alle Einträge des Users abgefrufen, abgesehen von dem Initialisierungseintrag*/
+                $entriesBase = Auth::user()->entries()->orderBy('date', 'asc')->where([['begin', '<>', null], ['end', '<>', null]])->get();
 
-            $date = new Carbon($entriesBase->first()->dateCarbon()->format('Y-m-01'));
+                if (count($entriesBase) == 0) {
 
-            while ($date->format('Y-m-d') <= date('Y-m-d')) {
-
-                if(count($entriesBase->where('date', $date->format('Y-m-d'))->all())==0) {
-
-                    $newEntry = new Entry;
-                    $newEntry->date = $date->format('Y-m-d');
-                    $newEntry->user_id = $entriesBase->first()->user_id;
-                    $newEntry->comment = 'no Entry';
-                    $entriesBase->push($newEntry);
-
+                    return view('user.entries.noEntries');
 
                 }
 
-                $date->addDay();
+                /*Der Datumsbereich beginnt am 1. Tag des Monats in dem der erste Eintrag existiert*/
+                $dateFrom = new Carbon($entriesBase->first()->dateCarbon()->format('Y-m-01'));
+                /*Der Datumsbereich endet am Tag des Agrufes*/
+                $dateTo = new Carbon(date('Y-m-d'));
+
+            } elseif ($year != null && $month != null) {
+
+                /*Der Datumsbereich wird anhand der Parameter defniert. Vom ersten des Monats bis zum ...*/
+                $dateFrom = new Carbon($year . '-'. $month . '-01');
+                /*... letzten des Monats*/
+                $dateTo = new Carbon($dateFrom);
+                $dateTo->addMonth()->subDay();
+
+                $entriesBase = Auth::user()->entries()->orderBy('date', 'asc')->where([['date', '>=', $dateFrom->format('Y-m-d')], ['date', '<', $dateFrom->addMonth()->format('Y-m-d')]])->get();
+
+                if (count($entriesBase) == 0) {
+
+                    return view('user.entries.noEntries');
+
+                }
 
             }
 
+            /*Jeder Tag im definierten Datumsbereich wird durchlaufen*/
+            while ($dateFrom->format('Y-m-d') <= $dateTo->format('Y-m-d')) {
+
+                /*Es wird geprüft ob am jeweiligen Datum KEIN Eintrag vorliegt*/
+                if(count($entriesBase->where('date', $dateFrom->format('Y-m-d'))->all())==0) {
+                    /*Ist dies der Fall, wird die ein Leerer Eintrag erstellt ... */
+                    $newEntry = new Entry;
+                    $newEntry->date = $dateFrom->format('Y-m-d');
+                    $newEntry->user_id = $entriesBase->first()->user_id;
+                    $newEntry->comment = 'no Entry';
+
+                    /* und in  die Collection geschrieben */
+                    $entriesBase->push($newEntry);
+
+                }
+
+                $dateFrom->addDay();
+
+            }
+            /*Die werte in der Tabelle werden Sortiert, damit die Liste in der Richtigen Reihenfolge erscheint*/
             $entries = $entriesBase->sortBy('date');
-            return view('admin.entries.index', compact('entries'));
+            return view('user.entries.index', compact('entries'));
+    }
 
-        } else {
+    public function balanceEndOfMonth() {
 
-            return "Es ist kein User angemeldet!";
+        $month = $month = Carbon::now();
+        $month->subMonths(6);
+
+        $allEntries = Auth::User()->entries()->where([['date', '>=', $month->format('Y-m-01')]])->orderBy('date', 'asc')->get();
+
+        if (count($allEntries) == 0) {
+
+            return view('user.entries.noEntries');
 
         }
+
+        $entries = collect();
+
+        for ($i = 1; $i <= 6; $i+=1) {
+
+            $month = Carbon::now();
+            $month->subMonths($i);
+            $singleEntry = $allEntries->where('date', '>=', $month->format('Y-m-01'))->where('date', '<', $month->addMonth()->format('Y-m-01'))->sortByDesc('date')->first();
+
+            $entries->push($singleEntry);
+
+        }
+        $monthes = ([1=>'Januar', 2=>'Februar', 3=>'März', 4=>'April',
+                     5=>'Mai', 6=>'Juni', 7=>'Juli', 8=>'August',
+                     9=>'September', 10=>'Oktober', 11=>'November', 12=>'Dezember']);
+        return view('user.entries.balances', compact('entries', 'monthes'));
 
     }
 
@@ -67,7 +122,7 @@ class EntryController extends Controller
 
         } else {
 
-            return view('admin.entries.init', compact('id'));
+            return view('user.entries.init', compact('id'));
         }
 
     }
@@ -155,7 +210,7 @@ class EntryController extends Controller
     public function create($date)
     {
         $schedule = Auth::User()->scheduleByDate($date);
-        return view('admin.entries.create', compact('date', 'schedule'));
+        return view('user.entries.create', compact('date', 'schedule'));
     }
 
     /**
@@ -215,7 +270,7 @@ class EntryController extends Controller
     public function edit($id)
     {
         $entry = Entry::findOrFail($id);
-        return view('admin.entries.edit', compact('entry'));
+        return view('user.entries.edit', compact('entry'));
     }
 
     /**
@@ -266,7 +321,7 @@ class EntryController extends Controller
     public function delete($id) {
 
         $entry = Entry::findOrFail($id);
-        return view('admin.entries.delete', compact('entry'));
+        return view('user.entries.delete', compact('entry'));
 
     }
 

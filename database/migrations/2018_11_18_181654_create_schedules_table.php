@@ -15,7 +15,7 @@ class CreateSchedulesTable extends Migration
     {
          Schema::create('schedules', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id');
+            $table->integer('user_id')->unsigned()->index();
             $table->integer('day');
             $table->time('begin')->nullable()->default(null);
             $table->time('end')->nullable()->default(null);
@@ -23,6 +23,8 @@ class CreateSchedulesTable extends Migration
             $table->date('valid_from')->default('2000-01-01');
             $table->integer('version')->default(1);
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

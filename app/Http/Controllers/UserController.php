@@ -32,7 +32,7 @@ class UserController extends Controller
     public function create()
     {
 
-        return view('admin.users.create');
+        return view('user.create');
 
     }
 
@@ -92,10 +92,11 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit()
     {
-        $user = User::findOrFail($id);
-        return view('admin.users.edit', compact('user'));
+
+        $user = Auth::User();
+        return view('user.edit', compact('user'));
     }
 
     /**
@@ -105,10 +106,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
 
-        $user = User::findOrFail($id);
+        $user = Auth::User();
 
         if($request->password !== null) {
 
@@ -121,15 +122,44 @@ class UserController extends Controller
 
         }
 
-        $user->update($input);
+        if ($input['command']=='save') {
 
-        return redirect(route('start'));
+
+            $user->update($input);
+            return redirect(route('start'));
+
+        } elseif ($input['command']=='delete') {
+
+            return redirect(route('user.deleteForm'));
+
+        } else {
+
+            return redirect(route('start'));
+
+        }
+
     }
 
-
-
-    public function destroy($id)
+    public function delete()
     {
-        //
+        $user = Auth::User();
+        return view('user.delete', compact('user'));
+    }
+
+    public function destroy(Request $request)
+    {
+        if ($request->command == 'yes') {
+
+            $user = Auth::User();
+            Auth::Logout();
+            $user->delete();
+            return redirect('/');
+
+        } else {
+
+
+        return redirect('start');
+
+        }
     }
 }
