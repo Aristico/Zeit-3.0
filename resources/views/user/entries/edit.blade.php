@@ -9,14 +9,16 @@
 
                 <div class="card-body">
 
-
                     <p class="alert alert-info">Sie Bearbeiten hier den Eintrag vom <b>{{$entry->dateCarbon()->format('d.m.Y')}}</b>. Die reguläre Arbeitszeit
-                       beträgt {{$entry->regular_hours}} Stunden und aktuell sind {{$entry->regular_hours}} Stunden vermerkt. Daraus ergibt sich
-                       eine Abweichung von {{$entry->overtime}} und ein Überstunden-Saldo von {{$entry->balance}}.</p>
+                       beträgt {{number_format($entry->regular_hours, 2, ',', '')}} Stunden und aktuell sind {{number_format($entry->regular_hours, 2, ',', '')}} Stunden vermerkt. Daraus ergibt sich
+                       eine Abweichung von {{number_format($entry->overtime, 2, ',', '')}} und ein Überstunden-Saldo von {{number_format($entry->balance, 2, ',', '')}} Stunden.</p>
 
                     <!-- bei Action den Controller und die Methode eintrage z.B. UserController@Create -->
                     {!! Form::model($entry, ['action'=>['EntryController@update', $entry->id], 'method' => 'PUT']) !!}
                         {{csrf_field()}}
+
+                        <input type="hidden" name="month" value="{{$entry->dateCarbon()->format('m')}}">
+                        <input type="hidden" name="year" value="{{$entry->dateCarbon()->format('Y')}}">
 
                         <div class="form-group">
                            {!! Form::label('begin', 'Anfang') !!}
