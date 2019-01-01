@@ -48,31 +48,6 @@ class Entry extends Model
 
     }
 
-    public function getBalanceAttribute ($value) {
-
-        return number_format($value, 2, ',', '');
-
-    }
-
-    public function getRegularHoursAttribute ($value) {
-
-        return number_format($value, 2, ',', '');
-
-    }
-
-    public function getActualHoursAttribute ($value) {
-
-        return number_format($value, 2, ',', '');
-
-    }
-
-    public function getOvertimeAttribute ($value) {
-
-        return number_format($value, 2, ',', '');
-
-    }
-
-
 //        'regular_hours',
 //        'actual_hours',
 //        'overtime',
