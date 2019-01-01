@@ -32,13 +32,6 @@ route::get('/init', function () {
         'password'=>bcrypt('K)/Llo7u'),
         'identifier'=>md5('john@doe.net') ]);
 
-    User::create([
-        'firstname'=>'Christian',
-        'name'=>'Ohning',
-        'email'=>'mail@ohning.net',
-        'password'=>bcrypt('K)/Llo7u'),
-        'identifier'=>md5('mail@ohning.net') ]);
-
     Schedule::create(['user_id'=>1, 'day'=>1, 'begin'=>'08:00', 'end'=>'18:00:00', 'break'=>60]);
     Schedule::create(['user_id'=>1, 'day'=>2, 'begin'=>'08:00:00', 'end'=>'16:00:00', 'break'=>60]);
     Schedule::create(['user_id'=>1, 'day'=>3, 'begin'=>'08:00:00', 'end'=>'16:00:00', 'break'=>60]);
@@ -46,6 +39,17 @@ route::get('/init', function () {
     Schedule::create(['user_id'=>1, 'day'=>5, 'begin'=>'08:00:00', 'end'=>'16:00:00', 'break'=>60]);
     Schedule::create(['user_id'=>1, 'day'=>6]);
     Schedule::create(['user_id'=>1, 'day'=>7]);
+
+});
+
+route::get('/init/example', function () {
+
+    User::create([
+        'firstname'=>'Christian',
+        'name'=>'Ohning',
+        'email'=>'mail@ohning.net',
+        'password'=>bcrypt('K)/Llo7u'),
+        'identifier'=>md5('mail@ohning.net') ]);
 
     Schedule::create(['user_id'=>2, 'day'=>1, 'begin'=>'08:00', 'end'=>'18:00:00', 'break'=>60]);
     Schedule::create(['user_id'=>2, 'day'=>2, 'begin'=>'08:00:00', 'end'=>'16:00:00', 'break'=>60]);
@@ -89,6 +93,7 @@ route::get('/init', function () {
 
     }
 });
+
 
 Auth::routes();
 
