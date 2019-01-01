@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Entry;
 use App\User;
 use Carbon\Carbon;
-use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -145,9 +144,9 @@ class EntryController extends Controller
             $user->entries()->create([
                 'date'=>date('Y-m-d'), /*Datum von Heute*/
                 'begin'=>date('H:i:s'), /*Aktuelle Uhrzeit*/
-                'break'=>$user->currentScheduleToday()['break'] == null ? 0 : $user->currentScheduleToday()['break'], /*Die Pause aus dem Zeitplan*/
-                'schedule_version'=>$user->currentScheduleToday()['version'], /*Die aktuelle Version*/
-                'regular_hours'=>$user->currentScheduleToday()->regularHours() /*Die geplante Arbeitszeit*/
+                'break'=>$user->scheduleByDate(date('Y-m-d'))['break'] == null ? 0 : $user->scheduleByDate(date('Y-m-d'))['break'], /*Die Pause aus dem Zeitplan*/
+                'schedule_version'=>$user->scheduleByDate(date('Y-m-d'))['version'], /*Die aktuelle Version*/
+                'regular_hours'=>$user->scheduleByDate(date('Y-m-d'))->regularHours() /*Die geplante Arbeitszeit*/
             ]);
             return 'Es wurde ein Eintrag angelegt';
         }
@@ -185,9 +184,9 @@ class EntryController extends Controller
                 'date'=>date('Y-m-d'), /*Datum von Heute*/
                 'begin'=>date('H:i:s'), /*Aktuelle Uhrzeit*/
                 'end'=>date('H:i:s'), /*Aktuelle Uhrzeit*/
-                'break'=>$user->currentScheduleToday()['break'] == null ? 0 : $user->currentScheduleToday()['break'], /*Die Pause aus dem Zeitplan*/
-                'schedule_version'=>$user->currentScheduleToday()['version'], /*Die aktuelle Version*/
-                'regular_hours'=>$user->currentScheduleToday()->regularHours() /*Die geplante Arbeitszeit*/
+                'break'=>$user->scheduleByDate(date('Y-m-d'))['break'] == null ? 0 : $user->scheduleByDate(date('Y-m-d'))['break'], /*Die Pause aus dem Zeitplan*/
+                'schedule_version'=>$user->scheduleByDate(date('Y-m-d'))['version'], /*Die aktuelle Version*/
+                'regular_hours'=>$user->scheduleByDate(date('Y-m-d'))->regularHours() /*Die geplante Arbeitszeit*/
             ]);
             return 'Es exitierte noch kein Eintrag und es wurde einer angelegt';
         }
