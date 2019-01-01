@@ -29,22 +29,26 @@
                            {!! Form::label('begin', 'Anfang') !!}
                            {!! Form::time('begin', $schedule->begin, ['title'=>'begin', 'class'=>'form-control'] ) !!}
                         </div>
+                        @include('includes.error', ['field'=>'begin'])
 
                         <div class="form-group">
                            {!! Form::label('end', 'Ende') !!}
                            {!! Form::time('end', $schedule->end, ['title'=>'end', 'class'=>'form-control'] ) !!}
                         </div>
+                        @include('includes.error', ['field'=>'end'])
 
                         <div class="form-group">
                            {!! Form::label('break', 'Pause') !!}
                            {!! Form::number('break', $schedule->break, ['title'=>'break', 'class'=>'form-control'] ) !!}
                         </div>
+                        @include('includes.error', ['field'=>'break'])
 
                         <div class="form-group">
                            {!! Form::label('comment', 'Kommentar:') !!}
                            {!! Form::text('comment', null, ['title'=>'comment', 'class'=>'form-control'] ) !!}
                         </div>
 
+                        @include('includes.errors')
                         <button class="btn btn-primary">Speichern</button>
 
                     {!! Form::close() !!}

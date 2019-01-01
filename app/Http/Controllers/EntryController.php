@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Entry;
+use App\Http\Requests\EntryInitRequest;
+use App\Http\Requests\EntryRequest;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -60,7 +62,6 @@ class EntryController extends Controller
             $entries = $entriesBase->sortBy('date');
             return view('user.entries.index', compact('entries'));
     }
-
     public function balanceEndOfMonth() {
 
         $allEntries = Auth::user()->entries()->orderBy('date', 'asc')->where([['begin', '<>', null], ['end', '<>', null]])->get();
@@ -100,7 +101,6 @@ class EntryController extends Controller
         return view('user.entries.balances', compact('entries', 'monthes'));
 
     }
-
     public function initShow ()
     {
 
@@ -116,8 +116,7 @@ class EntryController extends Controller
         }
 
     }
-
-    public function initSet (Request $request)
+    public function initSet (EntryInitRequest $request)
     {
         $date = new Carbon(date('Y-01-01 00:00:00'));
         $input = $request->all('balance');
@@ -130,7 +129,6 @@ class EntryController extends Controller
         return redirect(route('start'));
 
     }
-
     public function enter($identifier) {
 
 
@@ -209,7 +207,7 @@ class EntryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(EntryRequest $request)
     {
         $input = $request->all();
 
@@ -269,7 +267,7 @@ class EntryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EntryRequest $request, $id)
     {
         $input = $request->all();
 
