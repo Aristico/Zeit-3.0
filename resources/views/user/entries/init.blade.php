@@ -16,7 +16,7 @@
                         {{csrf_field()}}
                         <div class="form-group">
                            {!! Form::label('balance', 'Aktuelle Überstunden:') !!}
-                           {!! Form::number('balance', null , ['title'=>'balance', 'class'=>'form-control', 'step'=>0.25] ) !!}
+                           {!! Form::number('balance', 0 , ['title'=>'balance', 'class'=>'form-control', 'step'=>0.25] ) !!}
                         </div>
                         <div class="form-group">
                            {!! Form::submit('Speichern', ['class'=>'btn btn-primary'] ) !!}

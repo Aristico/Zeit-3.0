@@ -13,7 +13,7 @@
                         <thead>
                             <tr>
                                 <th>Monat</th>
-                                <th>Salco</th>
+                                <th>Saldo</th>
                                 <th>Aktion</th>
                             </tr>
                         </thead>
@@ -21,7 +21,7 @@
                             @foreach($entries as $entry)
                                 <tr>
                                     <td>{{$monthes[$entry->dateCarbon()->format('n')]}} {{$entry->dateCarbon()->format('Y')}} </td>
-                                    <td>{{$entry->balance}}</td>
+                                    <td>{{number_format($entry->balance, 2, ',', '')}}</td>
                                     <td><a href="{{route('entries.index.month', ['year'=>$entry->dateCarbon()->format('Y'), 'month'=>$entry->dateCarbon()->format('n')])}}">Anzeigen</a></td>
                                 </tr>
                             @endforeach

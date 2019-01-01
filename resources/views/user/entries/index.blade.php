@@ -2,13 +2,6 @@
 
 @section('content')
 
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">Elle bisherigen Einträge</div>
-
-                <div class="card-body">
-
                     <table class="table">
                         <thead>
                             <tr>
@@ -30,13 +23,17 @@
                                 ">
                                     <td>{{$entry->dateCarbon()->format('d.m.Y')}}</td>
                                     @if($entry->comment != 'no Entry')
-                                        <td>{{$entry->regular_hours}}</td>
-                                        <td>{{$entry->actual_hours}}</td>
-                                        <td>{{$entry->overtime}}</td>
-                                        <td>{{$entry->balance}}</td>
+                                        <td class="d-none d-lg-block">{{number_format($entry->regular_hours, 2, ',', '')}}</td>
+                                        <td>{{number_format($entry->actual_hours, 2, ',', '')}}</td>
+                                        <td>{{number_format($entry->overtime, 2, ',', '')}}</td>
+                                        <td>{{number_format($entry->balance, 2, ',', '')}}</td>
                                         <td>{{str_limit($entry->comment, 30)}}</td>
                                     @else
-                                        <td></td><td></td><td></td><td></td><td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
                                     @endif
                                     <td>@if($entry->comment != 'no Entry')
                                             <a href="{{route('entries.edit', $entry->id)}}">Bearbeiten</a>
@@ -46,11 +43,5 @@
                                 </tr>
                             @endforeach
                         </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
 @endsection

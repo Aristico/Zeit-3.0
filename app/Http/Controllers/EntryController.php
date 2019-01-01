@@ -19,49 +19,31 @@ class EntryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($year = null, $month = null)
+    public function index($year, $month)
     {
-
-            if ($year == null && $month == null){
-
-                /*Es wird alle Einträge des Users abgefrufen, abgesehen von dem Initialisierungseintrag*/
-                $entriesBase = Auth::user()->entries()->orderBy('date', 'asc')->where([['begin', '<>', null], ['end', '<>', null]])->get();
-
-                if (count($entriesBase) == 0) {
-
-                    return view('user.entries.noEntries');
-
-                }
-
-                /*Der Datumsbereich beginnt am 1. Tag des Monats in dem der erste Eintrag existiert*/
-                $dateFrom = new Carbon($entriesBase->first()->dateCarbon()->format('Y-m-01'));
-                /*Der Datumsbereich endet am Tag des Agrufes*/
-                $dateTo = new Carbon(date('Y-m-d'));
-
-            } elseif ($year != null && $month != null) {
 
                 /*Der Datumsbereich wird anhand der Parameter defniert. Vom ersten des Monats bis zum ...*/
                 $dateFrom = new Carbon($year . '-'. $month . '-01');
                 /*... letzten des Monats*/
+
                 $dateTo = new Carbon($dateFrom);
                 $dateTo->addMonth()->subDay();
 
-                $entriesBase = Auth::user()->entries()->orderBy('date', 'asc')->where([['date', '>=', $dateFrom->format('Y-m-d')], ['date', '<', $dateFrom->addMonth()->format('Y-m-d')]])->get();
+
+                $entriesBase = Auth::user()->entries()->orderBy('date', 'asc')->where([['date', '>=', $dateFrom->format('Y-m-d')], ['date', '<=', $dateTo->format('Y-m-d')]])->get();
 
                 if (count($entriesBase) == 0) {
 
                     return view('user.entries.noEntries');
 
                 }
-
-            }
 
             /*Jeder Tag im definierten Datumsbereich wird durchlaufen*/
             while ($dateFrom->format('Y-m-d') <= $dateTo->format('Y-m-d')) {
 
                 /*Es wird geprüft ob am jeweiligen Datum KEIN Eintrag vorliegt*/
                 if(count($entriesBase->where('date', $dateFrom->format('Y-m-d'))->all())==0) {
-                    /*Ist dies der Fall, wird die ein Leerer Eintrag erstellt ... */
+
                     $newEntry = new Entry;
                     $newEntry->date = $dateFrom->format('Y-m-d');
                     $newEntry->user_id = $entriesBase->first()->user_id;
@@ -82,10 +64,8 @@ class EntryController extends Controller
 
     public function balanceEndOfMonth() {
 
-        $month = $month = Carbon::now();
-        $month->subMonths(6);
-
-        $allEntries = Auth::User()->entries()->where([['date', '>=', $month->format('Y-m-01')]])->orderBy('date', 'asc')->get();
+        $allEntries = Auth::user()->entries()->orderBy('date', 'asc')->where([['begin', '<>', null], ['end', '<>', null]])->get();
+//
 
         if (count($allEntries) == 0) {
 
@@ -94,16 +74,27 @@ class EntryController extends Controller
         }
 
         $entries = collect();
+        $exit = false;
 
-        for ($i = 1; $i <= 6; $i+=1) {
+        $month = Carbon::now();
 
-            $month = Carbon::now();
-            $month->subMonths($i);
+        do {
+            $month->subMonth();
             $singleEntry = $allEntries->where('date', '>=', $month->format('Y-m-01'))->where('date', '<', $month->addMonth()->format('Y-m-01'))->sortByDesc('date')->first();
 
-            $entries->push($singleEntry);
+            $month->subMonth();
 
-        }
+            if($singleEntry != null) {
+
+                $entries->push($singleEntry);
+
+            } else {
+
+                $exit = true;
+            }
+
+        } while ($exit == false);
+
         $monthes = ([1=>'Januar', 2=>'Februar', 3=>'März', 4=>'April',
                      5=>'Mai', 6=>'Juni', 7=>'Juli', 8=>'August',
                      9=>'September', 10=>'Oktober', 11=>'November', 12=>'Dezember']);
@@ -244,8 +235,7 @@ class EntryController extends Controller
             Entry::findOrFail($row->id)->update(['balance'=>$balance]);
         }
 
-        return redirect(route('entries.index'));
-
+        return redirect(route('entries.index.month', ['month'=>$input['month'], 'year'=>$input['year']]));
 
     }
 
@@ -304,7 +294,7 @@ class EntryController extends Controller
                 Entry::findOrFail($row->id)->update(['balance'=>$balance]);
             }
 
-        return redirect(route('entries.index'));
+        return redirect(route('entries.index.month', ['month'=>$input['month'], 'year'=>$input['year']]));
 
         }  elseif ($input['command'] == 'delete') {
 
@@ -312,7 +302,7 @@ class EntryController extends Controller
 
         } else {
 
-            return redirect(route('entries.index'));
+            return redirect(route('entries.index.month', ['month'=>$input['month'], 'year'=>$input['year']]));
 
         }
 
@@ -333,9 +323,10 @@ class EntryController extends Controller
      */
     public function destroy(Request $request, $id)
     {
+
         $input = $request->all();
 
-        if($input['command'] = 'yes') {
+        if($input['command'] == 'yes') {
 
             $entry = Entry::findOrFail($id);
 
@@ -352,11 +343,12 @@ class EntryController extends Controller
                 Entry::findOrFail($row->id)->update(['balance' => $balance]);
             }
 
-            return redirect(route('entries.index'));
+            return redirect(route('entries.index.month', ['month'=>$input['month'], 'year'=>$input['year']]));
 
         } else {
 
-            return redirect(route('entries.index'));
+            return redirect(route('entries.index.month', ['month'=>$input['month'], 'year'=>$input['year']]));
+
 
         }
 

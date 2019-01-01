@@ -17,6 +17,9 @@
                         <input type="hidden" name="regular_hours" value="{{$schedule->regularHours()}}">
                         <input type="hidden" name="schedule_version" value="{{$schedule->version}}">
 
+                        <input type="hidden" name="year" value="{{\Carbon\Carbon::parse($date)->format('Y')}}">
+                        <input type="hidden" name="month" value="{{\Carbon\Carbon::parse($date)->format('m')}}">
+
                         <div class="form-group">
                            {!! Form::label('date', 'Datum') !!}
                            {!! Form::date('date', $date, ['title'=>'date', 'class'=>'form-control', 'readonly'] ) !!}
