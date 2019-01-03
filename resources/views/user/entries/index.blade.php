@@ -20,10 +20,10 @@
                                     @if($entry->comment == 'no Entry')
                                         {{'alert alert-warning'}}
                                     @endif
-                                ">
+                                    ">
                                     <td>{{$entry->dateCarbon()->format('d.m.Y')}}</td>
                                     @if($entry->comment != 'no Entry')
-                                        <td class="d-none d-lg-block">{{number_format($entry->regular_hours, 2, ',', '')}}</td>
+                                        <td>{{number_format($entry->regular_hours, 2, ',', '')}}</td>
                                         <td>{{number_format($entry->actual_hours, 2, ',', '')}}</td>
                                         <td>{{number_format($entry->overtime, 2, ',', '')}}</td>
                                         <td>{{number_format($entry->balance, 2, ',', '')}}</td>

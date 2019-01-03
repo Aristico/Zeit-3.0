@@ -31,7 +31,13 @@ class EntryController extends Controller
                 $dateTo->addMonth()->subDay();
 
 
-                $entriesBase = Auth::user()->entries()->orderBy('date', 'asc')->where([['date', '>=', $dateFrom->format('Y-m-d')], ['date', '<=', $dateTo->format('Y-m-d')]])->get();
+                $entriesBase = Auth::user()->entries()
+                                           ->orderBy('date', 'asc')
+                                           ->where([['date', '>=', $dateFrom->format('Y-m-d')],
+                                                    ['date', '<=', $dateTo->format('Y-m-d')],
+                                                    ['begin', '!=', null],
+                                                    ['end', '!=', null]])
+                                           ->get();
 
                 if (count($entriesBase) == 0) {
 
