@@ -27,14 +27,12 @@ class EntryController extends Controller
                 $dateFrom = new Carbon($year . '-'. $month . '-01');
                 /*... letzten des Monats*/
 
-                $dateTo = new Carbon($dateFrom);
-                $dateTo->addMonth()->subDay();
-
+                $dateFrom->format('Y-m') == date('Y-m') ? $dateTo = new Carbon(date('Y-m-d')) : $dateTo = new Carbon($dateFrom->format('Y-m-t'));
 
                 $entriesBase = Auth::user()->entries()
                                            ->orderBy('date', 'asc')
-                                           ->where([['date', '>=', $dateFrom->format('Y-m-d')],
-                                                    ['date', '<=', $dateTo->format('Y-m-d')],
+                                           ->where([['date', '>=', $dateFrom],
+                                                    ['date', '<=', $dateTo],
                                                     ['begin', '!=', null],
                                                     ['end', '!=', null]])
                                            ->get();
@@ -46,10 +44,10 @@ class EntryController extends Controller
                 }
 
             /*Jeder Tag im definierten Datumsbereich wird durchlaufen*/
-            while ($dateFrom->format('Y-m-d') <= $dateTo->format('Y-m-d')) {
+            while ($dateFrom <= $dateTo) {
 
                 /*Es wird geprüft ob am jeweiligen Datum KEIN Eintrag vorliegt*/
-                if(count($entriesBase->where('date', $dateFrom->format('Y-m-d'))->all())==0) {
+                if (count($entriesBase->where('date', $dateFrom->format('Y-m-d'))->all()) == 0) {
 
                     $newEntry = new Entry;
                     $newEntry->date = $dateFrom->format('Y-m-d');
@@ -63,7 +61,7 @@ class EntryController extends Controller
 
                 $dateFrom->addDay();
 
-            }
+            };
             /*Die werte in der Tabelle werden Sortiert, damit die Liste in der Richtigen Reihenfolge erscheint*/
             $entries = $entriesBase->sortBy('date');
             return view('user.entries.index', compact('entries'));
@@ -71,7 +69,7 @@ class EntryController extends Controller
     public function balanceEndOfMonth() {
 
         $allEntries = Auth::user()->entries()->orderBy('date', 'asc')->where([['begin', '<>', null], ['end', '<>', null]])->get();
-//
+
 
         if (count($allEntries) == 0) {
 
@@ -107,6 +105,7 @@ class EntryController extends Controller
         return view('user.entries.balances', compact('entries', 'monthes'));
 
     }
+
     public function initShow ()
     {
 
@@ -126,7 +125,7 @@ class EntryController extends Controller
     {
         $date = new Carbon(date('Y-01-01 00:00:00'));
         $input = $request->all('balance');
-        $input['date'] = $date->format('Y-m-d');
+        $input['date'] = $date->subYear()->format('Y-m-d');
         $input['comment'] = 'Start';
 
         $user = Auth::User();
