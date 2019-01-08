@@ -13,63 +13,95 @@ use Illuminate\Support\Facades\Auth;
 class EntryController extends Controller
 {
 
+    public function setDateRangeForQuery ($year, $month, $fillUpWeeks = false) {
+       
+        /*Der Datumsbereich wird anhand der Parameter defniert. Vom ersten des Monats bis zum ...*/
+        $range['from'] = new Carbon($year . '-'. $month . '-01');
 
+        /*... letzten des Monats, maximal aber der heutige Tag*/
+        $range['from']->format('Y-m') == date('Y-m') ? $range['to'] = new Carbon(date('Y-m-d')) : $range['to'] = new Carbon($range['from']->format('Y-m-t'));
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+        if ($fillUpWeeks == true) {
+
+            $range['from']->previous(Carbon::MONDAY);
+            $range['to']->next(Carbon::SUNDAY);
+
+        }
+
+        return $range;
+
+    }
+ 
+    
+    public function getEntriesOfSelectedRange ($rangeOfQuery) {
+
+        $entriesBase = Auth::user()->entries()
+        ->orderBy('date', 'asc')
+        ->where([['date', '>=', $rangeOfQuery['from']],
+                 ['date', '<=', $rangeOfQuery['to']],
+                 ['begin', '!=', null],
+                 ['end', '!=', null]])
+        ->get();
+
+        if (count($entriesBase) == 0) {
+
+            return null;
+
+        }
+
+        return $entriesBase;
+
+    }
+    
+    public function fillUpEmptyEntrys ($entriesBase, $rangeOfQuery) {
+
+        /*Jeder Tag im definierten Datumsbereich wird durchlaufen*/
+        while ($rangeOfQuery['from'] <= $rangeOfQuery['to']) {
+
+            /*Es wird geprüft ob am jeweiligen Datum KEIN Eintrag vorliegt*/
+            if (count($entriesBase->where('date', $rangeOfQuery['from']->format('Y-m-d'))->all()) == 0) {
+
+                $newEntry = new Entry;
+                $newEntry->date = $rangeOfQuery['from']->format('Y-m-d');
+                $newEntry->user_id = $entriesBase->first()->user_id;
+                $newEntry->comment = 'no Entry';
+
+                /* und in  die Collection geschrieben */
+                $entriesBase->push($newEntry);
+
+            }
+
+            $rangeOfQuery['from']->addDay();
+
+        };
+        
+        /*Die werte in der Tabelle werden Sortiert, damit die Liste in der Richtigen Reihenfolge erscheint*/
+        return $entriesBase->sortBy('date');
+
+    }
+
     public function index($year, $month)
     {
 
-                /*Der Datumsbereich wird anhand der Parameter defniert. Vom ersten des Monats bis zum ...*/
-                $dateFrom = new Carbon($year . '-'. $month . '-01');
-                /*... letzten des Monats*/
-
-                $dateFrom->format('Y-m') == date('Y-m') ? $dateTo = new Carbon(date('Y-m-d')) : $dateTo = new Carbon($dateFrom->format('Y-m-t'));
-
-                $entriesBase = Auth::user()->entries()
-                                           ->orderBy('date', 'asc')
-                                           ->where([['date', '>=', $dateFrom],
-                                                    ['date', '<=', $dateTo],
-                                                    ['begin', '!=', null],
-                                                    ['end', '!=', null]])
-                                           ->get();
-
-                if (count($entriesBase) == 0) {
-
-                    return view('user.entries.noEntries');
-
-                }
-
-            /*Jeder Tag im definierten Datumsbereich wird durchlaufen*/
-            while ($dateFrom <= $dateTo) {
-
-                /*Es wird geprüft ob am jeweiligen Datum KEIN Eintrag vorliegt*/
-                if (count($entriesBase->where('date', $dateFrom->format('Y-m-d'))->all()) == 0) {
-
-                    $newEntry = new Entry;
-                    $newEntry->date = $dateFrom->format('Y-m-d');
-                    $newEntry->user_id = $entriesBase->first()->user_id;
-                    $newEntry->comment = 'no Entry';
-
-                    /* und in  die Collection geschrieben */
-                    $entriesBase->push($newEntry);
-
-                }
-
-                $dateFrom->addDay();
-
-            };
-            /*Die werte in der Tabelle werden Sortiert, damit die Liste in der Richtigen Reihenfolge erscheint*/
-            $entries = $entriesBase->sortBy('date');
+            $rangeOfQuery = $this->setDateRangeForQuery($year, $month);
+            $entriesBase = $this->getEntriesOfSelectedRange($rangeOfQuery);
+            $entries = $this->fillUpEmptyEntrys($entriesBase, $rangeOfQuery); 
             return view('user.entries.index', compact('entries'));
+    
     }
+
+    public function createOvertimeStatement ($year, $month) {
+
+        $rangeOfQuery = $this->setDateRangeForQuery($year, $month, true);
+        $entriesBase = $this->getEntriesOfSelectedRange($rangeOfQuery);
+        $entries = $this->fillUpEmptyEntrys($entriesBase, $rangeOfQuery); 
+        return view('user.entries.index', compact('entries'));
+
+    }
+
     public function balanceEndOfMonth() {
 
         $allEntries = Auth::user()->entries()->orderBy('date', 'asc')->where([['begin', '<>', null], ['end', '<>', null]])->get();
-
 
         if (count($allEntries) == 0) {
 

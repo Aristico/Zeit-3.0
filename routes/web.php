@@ -68,7 +68,7 @@ route::get('/init/example', function () {
     while ($dateFrom->format('Y-m-d') <= date('Y-m-d')) {
 
 
-        $schedule = User::findOrFail(1)->scheduleByDate('2018-12-05');
+        $schedule = User::findOrFail(2)->scheduleByDate($dateFrom);
         $input = [];
         $begin = new Carbon($schedule->begin);
         $end = new Carbon($schedule->end);
@@ -95,7 +95,7 @@ route::get('/init/example', function () {
 });
 
 
-Auth::routes();
+Auth::routes(['verify'=>true]);
 
 Route::get('/test', function () {
 
@@ -107,7 +107,7 @@ Route::get('/test', function () {
     dd($hashed);
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/', function () {
 
@@ -136,8 +136,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/entries/init/set', 'EntryController@initSet')->name('entries.init.set');
     Route::get('/entries/{id}/delete', 'EntryController@delete')->name('entries.delete');
     Route::get('/entries/{date}/create', 'EntryController@create')->name('entries.create');
-
+    
     Route::get('/entries/index/{year}/{month}', 'EntryController@index')->name('entries.index.month');
+    Route::get('/entries/index/{year}/{month}/statement', 'EntryController@createOvertimeStatement')->name('entries.index.month.statement');
+    
     Route::get('/entries/index/balances', 'EntryController@balanceEndOfMonth')->name('entries.index.balances');
 
     Route::resource('/entries', 'EntryController')->except('create');

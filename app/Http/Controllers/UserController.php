@@ -14,7 +14,7 @@ class UserController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth')->except(['create', 'store']);
+        $this->middleware(['auth', 'verified'])->except(['create', 'store']);
     }
     /**
      * Display a listing of the resource.
