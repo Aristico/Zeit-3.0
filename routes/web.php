@@ -149,8 +149,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::resource('/user', 'UserController')->except('edit', 'update', 'delete', 'destroy');
 
-Route::post('/entries/{identifier}/enter', 'EntryController@enter')->name('entries.enter');
-Route::post('/entries/{identifier}/leave', 'EntryController@leave')->name('entries.leave');
+Route::get('/entries/{identifier}/enter', 'EntryController@enter')->name('entries.enter');
+Route::get('/entries/{identifier}/leave', 'EntryController@leave')->name('entries.leave');
 
 Route::get('/start', function () {
 
