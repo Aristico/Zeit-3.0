@@ -85,7 +85,17 @@ class EntryController extends Controller
 
             $rangeOfQuery = $this->setDateRangeForQuery($year, $month);
             $entriesBase = $this->getEntriesOfSelectedRange($rangeOfQuery);
-            $entries = $this->fillUpEmptyEntrys($entriesBase, $rangeOfQuery); 
+
+            if ($entriesBase != null) {
+
+                $entries = $this->fillUpEmptyEntrys($entriesBase, $rangeOfQuery);
+
+            } else {
+
+                return view('user.entries.noEntries'); 
+
+            }
+            
             return view('user.entries.index', compact('entries'));
     
     }
@@ -94,7 +104,13 @@ class EntryController extends Controller
 
         $rangeOfQuery = $this->setDateRangeForQuery($year, $month, true);
         $entriesBase = $this->getEntriesOfSelectedRange($rangeOfQuery);
-        $entries = $this->fillUpEmptyEntrys($entriesBase, $rangeOfQuery); 
+        
+        if ($entriesBase != null) {
+            $entries = $this->fillUpEmptyEntrys($entriesBase, $rangeOfQuery);
+        } else {
+            return view('user.entries.noEntries'); 
+        }
+        
         return view('user.entries.index', compact('entries'));
 
     }
