@@ -127,24 +127,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/delete', 'UserController@delete')->name('user.deleteForm');
     Route::delete('/user', 'UserController@destroy')->name('user.destroy');
 
-
-    Route::put('/schedule/update', 'ScheduleController@update')->name('schedule.update');
-    Route::get('/schedule/edit', 'ScheduleController@edit')->name('schedule.edit');
-    Route::resource('/schedule', 'ScheduleController')->except(['update', 'edit']);
-
-    Route::get('/entries/init', 'EntryController@initShow')->name('entries.init.show');
-    Route::post('/entries/init/set', 'EntryController@initSet')->name('entries.init.set');
-    Route::get('/entries/{id}/delete', 'EntryController@delete')->name('entries.delete');
-    Route::get('/entries/{date}/create', 'EntryController@create')->name('entries.create');
-    
-    Route::get('/entries/index/{year}/{month}', 'EntryController@index')->name('entries.index.month');
-    Route::get('/entries/index/{year}/{month}/statement', 'EntryController@createOvertimeStatement')->name('entries.index.month.statement');
-    
-    Route::get('/entries/index/balances', 'EntryController@balanceEndOfMonth')->name('entries.index.balances');
-
-    Route::resource('/entries', 'EntryController')->except('create');
-
 });
+
+
+
+Route::get('/entries/{id}/delete', 'EntryController@delete')->name('entries.delete');
+Route::get('/entries/{date}/create', 'EntryController@create')->name('entries.create');
+
+Route::get('/entries/index/{year}/{month}', 'EntryController@index')->name('entries.index.month');
+Route::get('/entries/index/{year}/{month}/statement', 'EntryController@createOvertimeStatement')->name('entries.index.month.statement');
+
+Route::get('/entries/index/balances', 'EntryController@balanceEndOfMonth')->name('entries.index.balances');
+
+Route::resource('/entries', 'EntryController')->except('create');
+
+
+Route::get('/entries/init', 'EntryController@initShow')->name('entries.init.show');
+Route::post('/entries/init/set', 'EntryController@initSet')->name('entries.init.set');
+
+Route::put('/schedule/update', 'ScheduleController@update')->name('schedule.update');
+Route::get('/schedule/edit', 'ScheduleController@edit')->name('schedule.edit');
+Route::resource('/schedule', 'ScheduleController')->except(['update', 'edit']);
 
 
 Route::resource('/user', 'UserController')->except('edit', 'update', 'delete', 'destroy');

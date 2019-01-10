@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\Auth;
 class EntryController extends Controller
 {
 
+    public function __construct()
+    {
+
+        $this->middleware(['auth']);
+        $this->middleware(['verified'])->except(['enter', 'leave', 'initShow', 'initSet']);
+
+
+    }
+
     public function setDateRangeForQuery ($year, $month, $fillUpWeeks = false) {
        
         /*Der Datumsbereich wird anhand der Parameter defniert. Vom ersten des Monats bis zum ...*/
@@ -182,6 +191,7 @@ class EntryController extends Controller
         return redirect(route('start'));
 
     }
+
     public function enter($identifier) {
 
 

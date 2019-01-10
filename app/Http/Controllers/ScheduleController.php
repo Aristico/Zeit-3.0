@@ -21,6 +21,15 @@ use Prophecy\Doubler\ClassPatch\MagicCallPatch;
 class ScheduleController extends Controller
 {
 
+    public function __construct()
+    {
+
+        $this->middleware(['auth'])->except(['create', 'store']);
+        $this->middleware(['verified'])->except(['create', 'store', 'edit', 'update']);
+
+
+    }
+
     /**
      * Show the form for creating a new resource.
      *
