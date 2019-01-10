@@ -139,11 +139,12 @@ Route::get('/entries/index/{year}/{month}/statement', 'EntryController@createOve
 
 Route::get('/entries/index/balances', 'EntryController@balanceEndOfMonth')->name('entries.index.balances');
 
-Route::resource('/entries', 'EntryController')->except('create');
 
 
 Route::get('/entries/init', 'EntryController@initShow')->name('entries.init.show');
 Route::post('/entries/init/set', 'EntryController@initSet')->name('entries.init.set');
+
+Route::resource('/entries', 'EntryController')->except('create');
 
 Route::put('/schedule/update', 'ScheduleController@update')->name('schedule.update');
 Route::get('/schedule/edit', 'ScheduleController@edit')->name('schedule.edit');
