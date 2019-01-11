@@ -153,8 +153,8 @@ Route::resource('/schedule', 'ScheduleController')->except(['update', 'edit']);
 
 Route::resource('/user', 'UserController')->except('edit', 'update', 'delete', 'destroy');
 
-Route::get('/entries/{identifier}/enter', 'EntryController@enter')->name('entries.enter');
-Route::get('/entries/{identifier}/leave', 'EntryController@leave')->name('entries.leave');
+Route::any('/entries/{identifier}/enter', 'EntryController@enter')->name('entries.enter');
+Route::any('/entries/{identifier}/leave', 'EntryController@leave')->name('entries.leave');
 
 Route::get('/start', function () {
 
