@@ -99,12 +99,8 @@ Auth::routes(['verify'=>true]);
 
 Route::get('/test', function () {
 
-    $password = 'hallo';
-    $hashed = bcrypt($password);
+    echo $_POST['date'];
 
-    //dd(Hash::check($password, $hashed));
-
-    dd($hashed);
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
