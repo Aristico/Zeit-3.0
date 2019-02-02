@@ -16,7 +16,7 @@ class EntryController extends Controller
     public function __construct()
     {
 
-        $this->middleware(['auth']);
+        $this->middleware(['auth'])->except(['enter', 'leave']);
         $this->middleware(['verified'])->except(['enter', 'leave', 'initShow', 'initSet']);
 
 
@@ -199,8 +199,8 @@ class EntryController extends Controller
         $user = User::where('identifier', '=', $identifier)->firstOrFail();
         /*Prüft ob bereits ein Eintrag existiert*/
         if(count($user->entries()->where('date', date('Y-m-d'))->get())>0){
-            $msg = 'Es exitiert bereits ein Eintrag';
-            return view('user.entries.success', compact('msg'));
+            return 'Es exitiert bereits ein Eintrag';
+            //return view('user.entries.success', compact('msg'));
         } else {
             /*Es werden Die Daten des Tages eingetragen */
             $user->entries()->create([
@@ -210,8 +210,8 @@ class EntryController extends Controller
                 'schedule_version'=>$user->scheduleByDate(date('Y-m-d'))['version'], /*Die aktuelle Version*/
                 'regular_hours'=>$user->scheduleByDate(date('Y-m-d'))->regularHours() /*Die geplante Arbeitszeit*/
             ]);
-            $msg = 'Eintrag erfolgreich';
-            return view('user.entries.success', compact('msg'));
+            return 'Eintrag erfolgreich';
+            //return view('user.entries.success', compact('msg'));
         }
     }
 
@@ -240,8 +240,8 @@ class EntryController extends Controller
                 'overtime'=>$overtime,
                 'balance'=>$balance
             ]);
-            $msg = "Der Eintrag wurde aktualisiert.";
-            return view('user.entries.success', compact('msg'));
+            return "Der Eintrag wurde aktualisiert.";
+            //return view('user.entries.success', compact('msg'));
         } else {
             /*Es werden Die Daten des Tages eingetragen */
             $user->entries()->create([
@@ -252,8 +252,8 @@ class EntryController extends Controller
                 'schedule_version'=>$user->scheduleByDate(date('Y-m-d'))['version'], /*Die aktuelle Version*/
                 'regular_hours'=>$user->scheduleByDate(date('Y-m-d'))->regularHours() /*Die geplante Arbeitszeit*/
             ]);
-            $msg = "Es exitierte noch kein Eintrag und es wurde einer angelegt";
-            return view('user.entries.success', compact('msg'));
+            return "Es exitierte noch kein Eintrag und es wurde einer angelegt";
+            //return view('user.entries.success', compact('msg'));
         }
     }
 
