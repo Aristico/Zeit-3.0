@@ -9,6 +9,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class EntryController extends Controller
 {
@@ -23,7 +24,7 @@ class EntryController extends Controller
     }
 
     public function setDateRangeForQuery ($year, $month, $fillUpWeeks = false) {
-       
+
         /*Der Datumsbereich wird anhand der Parameter defniert. Vom ersten des Monats bis zum ...*/
         $range['from'] = new Carbon($year . '-'. $month . '-01');
 
@@ -40,8 +41,8 @@ class EntryController extends Controller
         return $range;
 
     }
- 
-    
+
+
     public function getEntriesOfSelectedRange ($rangeOfQuery) {
 
         $entriesBase = Auth::user()->entries()
@@ -61,7 +62,7 @@ class EntryController extends Controller
         return $entriesBase;
 
     }
-    
+
     public function fillUpEmptyEntrys ($entriesBase, $rangeOfQuery) {
 
         /*Jeder Tag im definierten Datumsbereich wird durchlaufen*/
@@ -83,7 +84,7 @@ class EntryController extends Controller
             $rangeOfQuery['from']->addDay();
 
         };
-        
+
         /*Die werte in der Tabelle werden Sortiert, damit die Liste in der Richtigen Reihenfolge erscheint*/
         return $entriesBase->sortBy('date');
 
@@ -101,25 +102,25 @@ class EntryController extends Controller
 
             } else {
 
-                return view('user.entries.noEntries'); 
+                return view('user.entries.noEntries');
 
             }
-            
+
             return view('user.entries.index', compact('entries'));
-    
+
     }
 
     public function createOvertimeStatement ($year, $month) {
 
         $rangeOfQuery = $this->setDateRangeForQuery($year, $month, true);
         $entriesBase = $this->getEntriesOfSelectedRange($rangeOfQuery);
-        
+
         if ($entriesBase != null) {
             $entries = $this->fillUpEmptyEntrys($entriesBase, $rangeOfQuery);
         } else {
-            return view('user.entries.noEntries'); 
+            return view('user.entries.noEntries');
         }
-        
+
         return view('user.entries.index', compact('entries'));
 
     }
@@ -194,22 +195,30 @@ class EntryController extends Controller
 
     public function enter($identifier) {
 
+        Log::debug('EntryController - enter - Parameters: Identifier ' . $identifier);
 
         /*Ruft die aktuelle Zeit ab und den Benutzer, der zum identifier gehört*/
         $user = User::where('identifier', '=', $identifier)->firstOrFail();
         /*Prüft ob bereits ein Eintrag existiert*/
         if(count($user->entries()->where('date', date('Y-m-d'))->get())>0){
+            Log::debug('EntryController - enter: Es Exitiert bereits ein Eintrag');
             return 'Es exitiert bereits ein Eintrag';
             //return view('user.entries.success', compact('msg'));
         } else {
+            Log::debug('EntryController - enter: Es wird ein neuer Eintrag angelegt');
             /*Es werden Die Daten des Tages eingetragen */
-            $user->entries()->create([
+
+                        $values = [
                 'date'=>date('Y-m-d'), /*Datum von Heute*/
                 'begin'=>date('H:i:s'), /*Aktuelle Uhrzeit*/
                 'break'=>$user->scheduleByDate(date('Y-m-d'))['break'] == null ? 0 : $user->scheduleByDate(date('Y-m-d'))['break'], /*Die Pause aus dem Zeitplan*/
                 'schedule_version'=>$user->scheduleByDate(date('Y-m-d'))['version'], /*Die aktuelle Version*/
                 'regular_hours'=>$user->scheduleByDate(date('Y-m-d'))->regularHours() /*Die geplante Arbeitszeit*/
-            ]);
+            ];
+
+            Log::debug('EntryController - enter: Zu Speichernde Werte ' . print_r($values, true));
+
+            $user->entries()->create($values);
             return 'Eintrag erfolgreich';
             //return view('user.entries.success', compact('msg'));
         }
@@ -220,38 +229,59 @@ class EntryController extends Controller
         /*Ruft die aktuelle Zeit ab und den Benutzer, der zum identifier gehört*/
         $user = User::where('identifier', '=', $identifier)->firstOrFail();
 
+        Log::debug('EntryController - Leave - Parameter: Identifier ' . $identifier);
+
         /*Prüft ob bereits ein Eintrag existiert*/
         if(count($user->entries()->where('date', date('Y-m-d'))->get())>0){
+
+            Log::debug('EntryController - Leave - Parameter: Es liegt bereits ein Eintrag vor');
+
             /*Ländt den letzten Eintrag für den Überstundensaldo*/
             $last_entry = $user->entries()->orderBy('date', 'DESC')->where('date','<', date('Y-m-d'))->first();
 
+            log::debug('EntryController - Leave - Einträge - Last Entry ' . print_r($last_entry->toArray(), true));
+
             /*Lädt den aktuellen Eintrag*/
             $entry = $user->entries()->where('date', date('Y-m-d'))->firstOrFail();
+
+            log::debug('EntryController - Leave - Einträge - Entry ' . print_r($last_entry->toArray(), true));
 
             /*Berechnet die aktuelle Arbeitszeit, die Überstunden und den Überstundensaldo*/
             $actualHours = $entry->calculateHours($entry->begin, date('H:i:s'), $entry->break);
             $overtime = $actualHours - $entry->regular_hours;
             $balance = $last_entry['balance']+$overtime;
 
-            /*Schreibt die Daten in die Datenbank*/
-            $entry->update([
+            log::debug('EntryController - Leave - Calculated Values - actualHours' . $actualHours . 'overtime ' . $overtime . ' balance ' . $balance);
+
+            $valuesToUpdate = [
                 'end' =>date('H:i:s'),
                 'actual_hours'=>$actualHours,
                 'overtime'=>$overtime,
                 'balance'=>$balance
-            ]);
+            ];
+            /*Schreibt die Daten in die Datenbank*/
+            $entry->update($valuesToUpdate);
+
+            Log::debug('EntryController - Leave: Der Eintrag wurde mit folgenden Werten aktualisert ' . print_r($valuesToUpdate, true));
+
             return "Der Eintrag wurde aktualisiert.";
             //return view('user.entries.success', compact('msg'));
         } else {
-            /*Es werden Die Daten des Tages eingetragen */
-            $user->entries()->create([
+            Log::debug('EntryController - Leave - Parameter: Es liegt noch kein Eintrag vor. Er wird angelegt.');
+
+            $valuesToCreate = [
                 'date'=>date('Y-m-d'), /*Datum von Heute*/
                 'begin'=>date('H:i:s'), /*Aktuelle Uhrzeit*/
                 'end'=>date('H:i:s'), /*Aktuelle Uhrzeit*/
                 'break'=>$user->scheduleByDate(date('Y-m-d'))['break'] == null ? 0 : $user->scheduleByDate(date('Y-m-d'))['break'], /*Die Pause aus dem Zeitplan*/
                 'schedule_version'=>$user->scheduleByDate(date('Y-m-d'))['version'], /*Die aktuelle Version*/
                 'regular_hours'=>$user->scheduleByDate(date('Y-m-d'))->regularHours() /*Die geplante Arbeitszeit*/
-            ]);
+            ];
+            /*Es werden Die Daten des Tages eingetragen */
+            $user->entries()->create($valuesToCreate);
+
+            Log::debug('EntryController - Leave: Der Eintrag wurde mit folgenden Werten angelegt ' . print_r($valuesToCreate, true));
+
             return "Es exitierte noch kein Eintrag und es wurde einer angelegt";
             //return view('user.entries.success', compact('msg'));
         }

@@ -4,7 +4,7 @@ namespace App;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Support\Facades\Log;
 class Entry extends Model
 {
 
@@ -24,8 +24,13 @@ class Entry extends Model
 
     public function calculateHours($start, $end, $break) {
 
+        Log::debug('EntryModel - calculateHours - Parameters: start ' . $start . ' end: ' . $end . ' break: ' . $break);
+
         $begin = new Carbon($start);
         $difference = round((($begin->diffInSeconds(new Carbon($end)) - $break*60)/60/60)*4)/4;
+
+        Log::debug('EntryModel - calculateHours - calculatet Values: begin: ' . $begin . ' difference ' . $difference);
+
         return $difference;
 
     }
@@ -48,8 +53,4 @@ class Entry extends Model
 
     }
 
-//        'regular_hours',
-//        'actual_hours',
-//        'overtime',
-//        'balance',
 }
