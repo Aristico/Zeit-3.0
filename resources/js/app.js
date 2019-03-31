@@ -18,6 +18,7 @@ window.Vue = require('vue');
  */
 
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
+Vue.component('schedule-inputs', require('./components/ScheduleInputs.vue').default);
 
 // const files = require.context('./', true, /\.vue$/i)
 

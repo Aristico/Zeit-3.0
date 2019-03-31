@@ -2,12 +2,15 @@
 
 @section('content')
 
+
    <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">Arbeitszeiten bearbeiten</div>
 
             <div class="card-body">
+
+                    <schedule-inputs></schedule-inputs>
 
                     <!-- bei Action den Controller und die Methode eintrage z.B. UserController@Create -->
                     {!! Form::open(['action'=>['ScheduleController@update'], 'method' => 'put']) !!}
@@ -17,6 +20,7 @@
                             <p class="col-sm-4">Ende</p>
                             <p class="col-sm-2">Pause</p>
                         </div>
+
                         @If(count($schedule) > 0)
                             @foreach($schedule as $single_day)
                                 <div class="row">
