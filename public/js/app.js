@@ -1802,11 +1802,69 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['singleday'],
   data: function data() {
     return {
-      hallo: "Hallo Du"
+      day: this.singleday.day,
+      currentbreak: this.singleday.break,
+      dayBegin: this.singleday.begin,
+      dayEnd: this.singleday.end,
+      dayBreak: this.singleday.break
     };
+  },
+  computed: {
+    nameOfDay: function nameOfDay() {
+      return days[index];
+    }
+  },
+  methods: {
+    arrayForScheduleData: function arrayForScheduleData(field) {
+      return "day[".concat(this.day, "][").concat(field, "]");
+    },
+    isValid: function isValid(value) {
+      return value != "";
+    },
+    invalidClass: function invalidClass(value) {
+      return {
+        'is-invalid': !this.isValid(value)
+      };
+    }
   }
 });
 
@@ -36901,7 +36959,143 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_c("h1", [_vm._v(_vm._s(_vm.hallo))])])
+  return _c("div", { staticClass: "row" }, [
+    _c("div", { staticClass: "col-sm-2" }, [
+      _c("p", [_vm._v(_vm._s(_vm.singleday.name_of_day))])
+    ]),
+    _vm._v(" "),
+    _c("input", {
+      attrs: { type: "hidden", name: _vm.arrayForScheduleData("day") },
+      domProps: { value: _vm.singleday.day }
+    }),
+    _vm._v(" "),
+    _c("input", {
+      attrs: { type: "hidden", name: _vm.arrayForScheduleData("user_id") },
+      domProps: { value: _vm.singleday.user_id }
+    }),
+    _vm._v(" "),
+    _c("input", {
+      attrs: { type: "hidden", name: _vm.arrayForScheduleData("version") },
+      domProps: { value: _vm.singleday.version }
+    }),
+    _vm._v(" "),
+    _c("div", { staticClass: "form-group col-sm-4" }, [
+      _c(
+        "label",
+        {
+          staticClass: "sr-only",
+          attrs: { for: _vm.arrayForScheduleData("begin") }
+        },
+        [_vm._v("Beginn:")]
+      ),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.dayBegin,
+            expression: "dayBegin"
+          }
+        ],
+        staticClass: "form-control",
+        class: _vm.invalidClass(_vm.dayBegin),
+        attrs: {
+          title: "begin",
+          type: "time",
+          name: _vm.arrayForScheduleData("begin"),
+          id: _vm.arrayForScheduleData("begin")
+        },
+        domProps: { value: _vm.dayBegin },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.dayBegin = $event.target.value
+          }
+        }
+      })
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "form-group  col-sm-4" }, [
+      _c(
+        "label",
+        {
+          staticClass: "sr-only",
+          attrs: { for: _vm.arrayForScheduleData("end") }
+        },
+        [_vm._v("Ende:")]
+      ),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.dayEnd,
+            expression: "dayEnd"
+          }
+        ],
+        staticClass: "form-control",
+        class: _vm.invalidClass(_vm.dayEnd),
+        attrs: {
+          title: "end",
+          type: "time",
+          name: _vm.arrayForScheduleData("end"),
+          id: _vm.arrayForScheduleData("end")
+        },
+        domProps: { value: _vm.dayEnd },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.dayEnd = $event.target.value
+          }
+        }
+      })
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "form-group col-sm-2" }, [
+      _c(
+        "label",
+        {
+          staticClass: "sr-only",
+          attrs: { for: _vm.arrayForScheduleData("break") }
+        },
+        [_vm._v("Pause")]
+      ),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.dayBreak,
+            expression: "dayBreak"
+          }
+        ],
+        staticClass: "form-control",
+        class: _vm.invalidClass(_vm.dayBreak),
+        attrs: {
+          title: "break",
+          type: "number",
+          name: _vm.arrayForScheduleData("break"),
+          id: _vm.arrayForScheduleData("end")
+        },
+        domProps: { value: _vm.dayBreak },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.dayBreak = $event.target.value
+          }
+        }
+      })
+    ])
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true

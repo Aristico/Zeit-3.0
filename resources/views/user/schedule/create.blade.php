@@ -21,7 +21,7 @@
                             @foreach($defaults as $default)
                                 <div class="row">
                                     <div class="col-sm-2">
-                                        <p>{{$days[$default->day]}}</p>
+                                        <p>{{$default->name_of_day}}</p>
                                     </div>
                                     <input type="hidden" name="day[{{$default->day}}][day]" value="{{$default->day}}">
                                     <input type="hidden" name="day[{{$default->day}}][user_id]" value="{{$id}}">

@@ -19,6 +19,8 @@ class Schedule extends Model
 
     ];
 
+    protected $appends = ['name_of_day'];
+
 
     public function regularHours () {
 
@@ -31,6 +33,12 @@ class Schedule extends Model
 
         return $difference;
 
+    }
+
+    public function getNameOfDayAttribute ()
+    {
+        $days = [1 => 'Montag', 2 => 'Dienstag', 3 => 'Mittwoch', 4 => 'Donnerstag', 5 => 'Freitag', 6 => 'Samstag', 7 => 'Sonntag'];
+        return $days[$this->day];
     }
 
 }
