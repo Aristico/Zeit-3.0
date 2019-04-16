@@ -1,7 +1,8 @@
 <template>
     <div>
+        <!--
         <form @submit.prevent="submitForm">
-
+            -->
             <div class="row">
                 <p class="col-sm-4 offset-2">Anfang</p>
                 <p class="col-sm-4">Ende</p>
@@ -9,11 +10,17 @@
             </div>
 
             <schedule-inputs v-for="(day, key) in schedule" :singleday="day" :key="key"></schedule-inputs>
-
-            <button class="btn btn-primary" name="Submit">Speichern</button>
-
-        </form>
-
+            <div class="row">
+            <h3>Schritt 1</h3>
+                           <button class="btn btn-primary" value="false" name="ready">Ändern</button>
+            </div>
+            <div class="row">
+            <h3>Schritt 2</h3>
+                           <button class="btn btn-primary" value="true" name="ready">Speichern</button>
+                           <button class="btn btn-secondary" value="false" name="ready">Ändern</button>
+            </div>
+       <!-- </form>
+        -->
     </div>
 </template>
 

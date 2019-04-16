@@ -1815,6 +1815,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['csrf', 'schedule'],
   data: function data() {
@@ -37021,33 +37028,21 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [
-    _c(
-      "form",
-      {
-        on: {
-          submit: function($event) {
-            $event.preventDefault()
-            return _vm.submitForm($event)
-          }
-        }
-      },
-      [
-        _vm._m(0),
-        _vm._v(" "),
-        _vm._l(_vm.schedule, function(day, key) {
-          return _c("schedule-inputs", { key: key, attrs: { singleday: day } })
-        }),
-        _vm._v(" "),
-        _c(
-          "button",
-          { staticClass: "btn btn-primary", attrs: { name: "Submit" } },
-          [_vm._v("Speichern")]
-        )
-      ],
-      2
-    )
-  ])
+  return _c(
+    "div",
+    [
+      _vm._m(0),
+      _vm._v(" "),
+      _vm._l(_vm.schedule, function(day, key) {
+        return _c("schedule-inputs", { key: key, attrs: { singleday: day } })
+      }),
+      _vm._v(" "),
+      _vm._m(1),
+      _vm._v(" "),
+      _vm._m(2)
+    ],
+    2
+  )
 }
 var staticRenderFns = [
   function() {
@@ -37060,6 +37055,49 @@ var staticRenderFns = [
       _c("p", { staticClass: "col-sm-4" }, [_vm._v("Ende")]),
       _vm._v(" "),
       _c("p", { staticClass: "col-sm-2" }, [_vm._v("Pause")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("h3", [_vm._v("Schritt 1")]),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-primary",
+          attrs: { value: "false", name: "ready" }
+        },
+        [_vm._v("Ändern")]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("h3", [_vm._v("Schritt 2")]),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-primary",
+          attrs: { value: "true", name: "ready" }
+        },
+        [_vm._v("Speichern")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-secondary",
+          attrs: { value: "false", name: "ready" }
+        },
+        [_vm._v("Ändern")]
+      )
     ])
   }
 ]

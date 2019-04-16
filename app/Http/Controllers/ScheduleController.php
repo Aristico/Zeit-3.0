@@ -117,7 +117,8 @@ class ScheduleController extends Controller
      */
     public function update(Request $request)
     {
-
+        dd($request);
+        
         $id = Auth::User()->id;
 
         /* Die Fertig Schaltfläche ersheint nur, wenn die Seite ein-Mal abgesendet wurde

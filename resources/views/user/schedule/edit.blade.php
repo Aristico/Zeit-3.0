@@ -9,7 +9,9 @@
                 <div class="card-header">Arbeitszeiten bearbeiten</div>
 
                 <div class="card-body">
-                <schedule-form :schedule="{{ $schedule }}"></schedule-form>
+                    {!! Form::open(['action'=>['ScheduleController@update'], 'method' => 'put']) !!}
+                        <schedule-form :schedule="{{ $schedule }}"></schedule-form>
+                    {!! Form::close() !!}
                 </div>
             </div>
         </div>
