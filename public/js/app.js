@@ -1787,6 +1787,61 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleForm.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ScheduleForm.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['csrf', 'schedule'],
+  data: function data() {
+    return {
+      currentSchedule: this.schedule
+    };
+  },
+  computed: {
+    activeSchedule: function activeSchedule() {
+      return this.currentSchedule.filter(function (value) {
+        return value.active;
+      });
+    }
+  },
+  created: function created() {
+    this.currentSchedule.forEach(function (element) {
+      if (element.begin === null) {
+        element.active = false;
+      } else {
+        element.active = true;
+      }
+    });
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleInputs.vue?vue&type=script&lang=js&":
 /*!*************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ScheduleInputs.vue?vue&type=script&lang=js& ***!
@@ -1837,6 +1892,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['singleday'],
   data: function data() {
@@ -1845,7 +1906,8 @@ __webpack_require__.r(__webpack_exports__);
       currentbreak: this.singleday.break,
       dayBegin: this.singleday.begin,
       dayEnd: this.singleday.end,
-      dayBreak: this.singleday.break
+      dayBreak: this.singleday.break,
+      dayActive: this.singleday.active
     };
   },
   computed: {
@@ -36944,6 +37006,69 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleForm.vue?vue&type=template&id=16f3ee66&":
+/*!***************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ScheduleForm.vue?vue&type=template&id=16f3ee66& ***!
+  \***************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c(
+      "form",
+      {
+        on: {
+          submit: function($event) {
+            $event.preventDefault()
+            return _vm.submitForm($event)
+          }
+        }
+      },
+      [
+        _vm._m(0),
+        _vm._v(" "),
+        _vm._l(_vm.schedule, function(day, key) {
+          return _c("schedule-inputs", { key: key, attrs: { singleday: day } })
+        }),
+        _vm._v(" "),
+        _c(
+          "button",
+          { staticClass: "btn btn-primary", attrs: { name: "Submit" } },
+          [_vm._v("Speichern")]
+        )
+      ],
+      2
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("p", { staticClass: "col-sm-4 offset-2" }, [_vm._v("Anfang")]),
+      _vm._v(" "),
+      _c("p", { staticClass: "col-sm-4" }, [_vm._v("Ende")]),
+      _vm._v(" "),
+      _c("p", { staticClass: "col-sm-2" }, [_vm._v("Pause")])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleInputs.vue?vue&type=template&id=7e3b62ea&":
 /*!*****************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ScheduleInputs.vue?vue&type=template&id=7e3b62ea& ***!
@@ -36960,9 +37085,11 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "row" }, [
-    _c("div", { staticClass: "col-sm-2" }, [
-      _c("p", [_vm._v(_vm._s(_vm.singleday.name_of_day))])
-    ]),
+    _vm.dayActive
+      ? _c("div", { staticClass: "col-sm-2" }, [
+          _c("p", [_vm._v(_vm._s(_vm.singleday.name_of_day))])
+        ])
+      : _vm._e(),
     _vm._v(" "),
     _c("input", {
       attrs: { type: "hidden", name: _vm.arrayForScheduleData("day") },
@@ -36979,122 +37106,149 @@ var render = function() {
       domProps: { value: _vm.singleday.version }
     }),
     _vm._v(" "),
-    _c("div", { staticClass: "form-group col-sm-4" }, [
-      _c(
-        "label",
-        {
-          staticClass: "sr-only",
-          attrs: { for: _vm.arrayForScheduleData("begin") }
-        },
-        [_vm._v("Beginn:")]
-      ),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.dayBegin,
-            expression: "dayBegin"
-          }
-        ],
-        staticClass: "form-control",
-        class: _vm.invalidClass(_vm.dayBegin),
-        attrs: {
-          title: "begin",
-          type: "time",
-          name: _vm.arrayForScheduleData("begin"),
-          id: _vm.arrayForScheduleData("begin")
-        },
-        domProps: { value: _vm.dayBegin },
-        on: {
-          input: function($event) {
-            if ($event.target.composing) {
-              return
+    _vm.dayActive
+      ? _c("div", { staticClass: "form-group col-sm-4" }, [
+          _c(
+            "label",
+            {
+              staticClass: "sr-only",
+              attrs: { for: _vm.arrayForScheduleData("begin") }
+            },
+            [_vm._v("Beginn:")]
+          ),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.dayBegin,
+                expression: "dayBegin"
+              }
+            ],
+            staticClass: "form-control",
+            class: _vm.invalidClass(_vm.dayBegin),
+            attrs: {
+              title: "begin",
+              type: "time",
+              name: _vm.arrayForScheduleData("begin"),
+              id: _vm.arrayForScheduleData("begin")
+            },
+            domProps: { value: _vm.dayBegin },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.dayBegin = $event.target.value
+              }
             }
-            _vm.dayBegin = $event.target.value
-          }
-        }
-      })
-    ]),
+          })
+        ])
+      : _vm._e(),
     _vm._v(" "),
-    _c("div", { staticClass: "form-group  col-sm-4" }, [
-      _c(
-        "label",
-        {
-          staticClass: "sr-only",
-          attrs: { for: _vm.arrayForScheduleData("end") }
-        },
-        [_vm._v("Ende:")]
-      ),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.dayEnd,
-            expression: "dayEnd"
-          }
-        ],
-        staticClass: "form-control",
-        class: _vm.invalidClass(_vm.dayEnd),
-        attrs: {
-          title: "end",
-          type: "time",
-          name: _vm.arrayForScheduleData("end"),
-          id: _vm.arrayForScheduleData("end")
-        },
-        domProps: { value: _vm.dayEnd },
-        on: {
-          input: function($event) {
-            if ($event.target.composing) {
-              return
-            }
-            _vm.dayEnd = $event.target.value
-          }
-        }
-      })
-    ]),
+    !_vm.dayActive
+      ? _c("input", {
+          attrs: { type: "hidden", name: _vm.arrayForScheduleData("begin") },
+          domProps: { value: _vm.dayBegin }
+        })
+      : _vm._e(),
     _vm._v(" "),
-    _c("div", { staticClass: "form-group col-sm-2" }, [
-      _c(
-        "label",
-        {
-          staticClass: "sr-only",
-          attrs: { for: _vm.arrayForScheduleData("break") }
-        },
-        [_vm._v("Pause")]
-      ),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.dayBreak,
-            expression: "dayBreak"
-          }
-        ],
-        staticClass: "form-control",
-        class: _vm.invalidClass(_vm.dayBreak),
-        attrs: {
-          title: "break",
-          type: "number",
-          name: _vm.arrayForScheduleData("break"),
-          id: _vm.arrayForScheduleData("end")
-        },
-        domProps: { value: _vm.dayBreak },
-        on: {
-          input: function($event) {
-            if ($event.target.composing) {
-              return
+    _vm.dayActive
+      ? _c("div", { staticClass: "form-group  col-sm-4" }, [
+          _c(
+            "label",
+            {
+              staticClass: "sr-only",
+              attrs: { for: _vm.arrayForScheduleData("end") }
+            },
+            [_vm._v("Ende:")]
+          ),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.dayEnd,
+                expression: "dayEnd"
+              }
+            ],
+            staticClass: "form-control",
+            class: _vm.invalidClass(_vm.dayEnd),
+            attrs: {
+              title: "end",
+              type: "time",
+              name: _vm.arrayForScheduleData("end"),
+              id: _vm.arrayForScheduleData("end")
+            },
+            domProps: { value: _vm.dayEnd },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.dayEnd = $event.target.value
+              }
             }
-            _vm.dayBreak = $event.target.value
-          }
-        }
-      })
-    ])
+          })
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    !_vm.dayActive
+      ? _c("input", {
+          attrs: { type: "hidden", name: _vm.arrayForScheduleData("end") },
+          domProps: { value: _vm.dayEnd }
+        })
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.dayActive
+      ? _c("div", { staticClass: "form-group col-sm-2" }, [
+          _c(
+            "label",
+            {
+              staticClass: "sr-only",
+              attrs: { for: _vm.arrayForScheduleData("break") }
+            },
+            [_vm._v("Pause")]
+          ),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.dayBreak,
+                expression: "dayBreak"
+              }
+            ],
+            staticClass: "form-control",
+            class: _vm.invalidClass(_vm.dayBreak),
+            attrs: {
+              title: "break",
+              type: "number",
+              name: _vm.arrayForScheduleData("break"),
+              id: _vm.arrayForScheduleData("end")
+            },
+            domProps: { value: _vm.dayBreak },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.dayBreak = $event.target.value
+              }
+            }
+          })
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    !_vm.dayActive
+      ? _c("input", {
+          attrs: { type: "hidden", name: _vm.arrayForScheduleData("break") },
+          domProps: { value: _vm.dayBreak }
+        })
+      : _vm._e()
   ])
 }
 var staticRenderFns = []
@@ -49264,7 +49418,8 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
  */
 
 Vue.component('example-component', __webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/js/components/ExampleComponent.vue"));
-Vue.component('schedule-inputs', __webpack_require__(/*! ./components/ScheduleInputs.vue */ "./resources/js/components/ScheduleInputs.vue").default); // const files = require.context('./', true, /\.vue$/i)
+Vue.component('schedule-inputs', __webpack_require__(/*! ./components/ScheduleInputs.vue */ "./resources/js/components/ScheduleInputs.vue").default);
+Vue.component('schedule-form', __webpack_require__(/*! ./components/ScheduleForm.vue */ "./resources/js/components/ScheduleForm.vue").default); // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => {
 //     return Vue.component(_.last(key.split('/')).split('.')[0], files(key))
 // })
@@ -49403,6 +49558,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ExampleComponent_vue_vue_type_template_id_299e239e___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ExampleComponent_vue_vue_type_template_id_299e239e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/ScheduleForm.vue":
+/*!**************************************************!*\
+  !*** ./resources/js/components/ScheduleForm.vue ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ScheduleForm_vue_vue_type_template_id_16f3ee66___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ScheduleForm.vue?vue&type=template&id=16f3ee66& */ "./resources/js/components/ScheduleForm.vue?vue&type=template&id=16f3ee66&");
+/* harmony import */ var _ScheduleForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ScheduleForm.vue?vue&type=script&lang=js& */ "./resources/js/components/ScheduleForm.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _ScheduleForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ScheduleForm_vue_vue_type_template_id_16f3ee66___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _ScheduleForm_vue_vue_type_template_id_16f3ee66___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/ScheduleForm.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/ScheduleForm.vue?vue&type=script&lang=js&":
+/*!***************************************************************************!*\
+  !*** ./resources/js/components/ScheduleForm.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ScheduleForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./ScheduleForm.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleForm.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ScheduleForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/ScheduleForm.vue?vue&type=template&id=16f3ee66&":
+/*!*********************************************************************************!*\
+  !*** ./resources/js/components/ScheduleForm.vue?vue&type=template&id=16f3ee66& ***!
+  \*********************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ScheduleForm_vue_vue_type_template_id_16f3ee66___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./ScheduleForm.vue?vue&type=template&id=16f3ee66& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleForm.vue?vue&type=template&id=16f3ee66&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ScheduleForm_vue_vue_type_template_id_16f3ee66___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ScheduleForm_vue_vue_type_template_id_16f3ee66___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

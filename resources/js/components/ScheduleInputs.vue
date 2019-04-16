@@ -1,6 +1,6 @@
 <template>
         <div class="row">
-            <div class="col-sm-2">
+            <div v-if="dayActive" class="col-sm-2">
                 <p>{{singleday.name_of_day}}</p>
             </div>
 
@@ -8,7 +8,7 @@
             <input type="hidden" :name="arrayForScheduleData('user_id')" :value="singleday.user_id">
             <input type="hidden" :name="arrayForScheduleData('version')" :value="singleday.version">
 
-            <div class="form-group col-sm-4">
+            <div v-if="dayActive" class="form-group col-sm-4">
                 <label :for="arrayForScheduleData('begin')" class="sr-only">Beginn:</label>
                 <input title="begin" class="form-control" type="time"
                     :name="arrayForScheduleData('begin')"
@@ -18,7 +18,9 @@
                 >
 
             </div>
-            <div class="form-group  col-sm-4">
+            <input v-if="!dayActive" type="hidden" :name="arrayForScheduleData('begin')" :value="dayBegin">
+
+            <div v-if="dayActive" class="form-group  col-sm-4">
                 <label :for="arrayForScheduleData('end')" class="sr-only">Ende:</label>
                 <input title="end" class="form-control" type="time"
                     :name="arrayForScheduleData('end')"
@@ -27,7 +29,9 @@
                     :class="invalidClass(dayEnd)"
                 >
             </div>
-            <div class="form-group col-sm-2">
+            <input v-if="!dayActive" type="hidden" :name="arrayForScheduleData('end')" :value="dayEnd">
+
+            <div v-if="dayActive" class="form-group col-sm-2">
                 <label :for="arrayForScheduleData('break')" class="sr-only">Pause</label>
                 <input title="break" class="form-control" type="number"
                     :name="arrayForScheduleData('break')"
@@ -36,6 +40,8 @@
                     :class="invalidClass(dayBreak)"
                 >
             </div>
+            <input v-if="!dayActive" type="hidden" :name="arrayForScheduleData('break')" :value="dayBreak">
+
         </div>
 </template>
 
@@ -48,7 +54,8 @@ export default {
             currentbreak: this.singleday.break,
             dayBegin: this.singleday.begin,
             dayEnd: this.singleday.end,
-            dayBreak: this.singleday.break
+            dayBreak: this.singleday.break,
+            dayActive: this.singleday.active
         }
     },
     computed: {
