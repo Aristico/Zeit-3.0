@@ -29,7 +29,9 @@ class Schedule extends Model
         * */
 
         $begin = new Carbon($this->begin);
-        $difference = round((($begin->diffInSeconds(new Carbon($this->end)) - $this->break*60)/60/60)*4)/4;
+        $difference = round(
+                                (($begin->diffInSeconds(new Carbon($this->end)) - $this->break*60)/60/60
+                            )*4)/4;
 
         return $difference;
 

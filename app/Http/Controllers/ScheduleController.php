@@ -117,72 +117,51 @@ class ScheduleController extends Controller
      */
     public function update(Request $request)
     {
-        dd($request);
-        
         $id = Auth::User()->id;
 
-        /* Die Fertig Schaltfläche ersheint nur, wenn die Seite ein-Mal abgesendet wurde
-         * Wenn die Fertig Schaltfläche gedrückt wird, dann leite Weiter an Home
-         * */
+
+        /* Beim ersten Aufruf und wenn nochmal geändert wurde, wird dieser Bereich abgespielt.
+            * Stunden werden für die Berechnung auf 0 gesetzt
+            * Der Request wird in ein array geschrieben
+            * Das Gültig Ab datum wird auf den kommenden Montag gelegt, damit die aktuelle Woche nicht beeinflusst wird.
+            * */
+
+        $hours = 0;
+        $date = new Carbon('Next Monday');
+        $input = $request->day;
+
+        /* Existiert schon eine Geänderte Version in der Zukunft, dann wird diese gelöscht.
+            * */
+
+        Auth::User()->schedules()->where('valid_from', '=', $date)->delete();
 
 
-        if($request->ready == "true") {
+        /* Speichert die Daten in der Datenbank. Die Version wird um eins erhöht.
+            * Das Gültig Ab Datum wird auch festgelegt.
+            * */
+        foreach ($input as $day) {
 
-            if(count(Entry::where('user_id', $id)->get()) > 0) {
+            $day['version'] += 1;
+            $day['valid_from'] = $date->format('Y-m-d');
+            $schedule = Schedule::create($day);
 
-                return redirect(route('start'));
+            $hours += $schedule->regularHours();
 
-            } else {
-
-                return redirect(route('entries.init.show'));
-            }
-
-        } else {
-
-            /* Beim ersten Aufruf und wenn nochmal geändert wurde, wird dieser Bereich abgespielt.
-             * Stunden werden für die Berechnung auf 0 gesetzt
-             * Der Request wird in ein array geschrieben
-             * Das Gültig Ab datum wird auf den kommenden Montag gelegt, damit die aktuelle Woche nicht beeinflusst wird.
-             * */
-
-            $hours = 0;
-
-            $date = new Carbon('Next Monday');
-            $input = $request->day;
-
-
-            /* Existiert schon eine Geänderte Version in der Zukunft, dann wird diese gelöscht.
-             * */
-
-            Auth::User()->schedules()->where('valid_from', '=', $date)->delete();
-
-
-            /* Speichert die Daten in der Datenbank. Die Version wird um eins erhöht.
-             * Das Gültig Ab Datum wird auch festgelegt.
-             * */
-            foreach ($input as $day) {
-
-                $day['version'] += 1;
-                $day['valid_from'] = $date->format('Y-m-d');
-                $schedule = Schedule::create($day);
-
-                $hours += $schedule->regularHours();
-
-            }
+        }
 
              /* Erzeugt die Erfolgsmeldung für den folgenden Screen
               * Die Session info "success" wird dafür benutzt um bestimmte Buttons ein/auszublenden.
               * */
 
-            session()->flash('info_message', 'Bitte prüfen Sie Ihre Wochenarbeitszeit. Ihre Angabe führen zu einer Wochenarbeitszeit von ' . $hours . ' Stunden.');
-            session()->flash('success', 'true');
+        session()->flash('info_message', 'Bitte prüfen Sie Ihre Wochenarbeitszeit. Ihre Angabe führen zu einer Wochenarbeitszeit von ' . $hours . ' Stunden.');
+        session()->flash('success', 'true');
 
-            /* Zeigt nochmal die Bearbeiten Seite an um sie zu bestätigen oder nochmal ändern zu können.
-             * */
+        /* Zeigt nochmal die Bearbeiten Seite an um sie zu bestätigen oder nochmal ändern zu können.
+            * */
 
-            return redirect(route('schedule.edit'));
+        return redirect(route('start'));
 
-        }
+
 
 
 

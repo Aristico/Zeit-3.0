@@ -1822,27 +1822,76 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['csrf', 'schedule'],
   data: function data() {
     return {
-      currentSchedule: this.schedule
+      currentSchedule: this.schedule,
+      sumOfWorkingHours: 0,
+      validate: false,
+      inputsValid: [],
+      inputNeedsValidationMessage: false
     };
   },
-  computed: {
-    activeSchedule: function activeSchedule() {
-      return this.currentSchedule.filter(function (value) {
-        return value.active;
+  methods: {
+    startValidation: function startValidation() {
+      this.validate = true;
+    },
+    createDate: function createDate(time) {
+      return new Date('2000-01-01 ' + time);
+    },
+    calculateWorkingHours: function calculateWorkingHours(currentDay) {
+      return Math.round((this.createDate(currentDay.end) - this.createDate(currentDay.begin) - currentDay.break * 60 * 1000) / 1000 / 60 / 60 * 4) / 4;
+    },
+    updateWorkingHours: function updateWorkingHours(values) {
+      /*this.currentSchedule[values.day-1].workingHours = values.workingHours;
+      this.inputsValid[values.day-1] = values.inputsValid;
+       let sum = 0;
+      this.currentSchedule.forEach(element => {
+          element.workingHours > 0 ? sum += element.workingHours : sum +=0 ;
       });
+      this.sumOfWorkingHours = sum;
+       this.inputNeedsValidationMessage = false;
+      this.inputsValid.forEach(element => {
+          if (element === false) {this.inputNeedsValidationMessage = true;}
+      })
+      */
     }
   },
   created: function created() {
+    /*let sum = 0;*/
     this.currentSchedule.forEach(function (element) {
       if (element.begin === null) {
         element.active = false;
       } else {
         element.active = true;
       }
+
+      element.workingHours = 0;
+      /*this.calculateWorkingHours(element);*/
+
+      /*element.workingHours > 0 ? sum += element.workingHours : sum +=0 ;
+      this.sumOfWorkingHours = sum;*/
     });
   }
 });
@@ -1906,33 +1955,103 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['singleday'],
+  props: ['singleday', 'validate'],
   data: function data() {
     return {
-      day: this.singleday.day,
-      currentbreak: this.singleday.break,
-      dayBegin: this.singleday.begin,
-      dayEnd: this.singleday.end,
-      dayBreak: this.singleday.break,
-      dayActive: this.singleday.active
+      day: this.singleday,
+      validationMessages: []
     };
   },
+  watch: {
+    validate: function validate() {
+      if (this.validate === true && this.day.active) {
+        this.setValidationMessages();
+        this.day.workingHours = this.dayWorkingHours;
+        this.$emit('validationResult', {
+          'singleDay': this.day,
+          'inputsValid': this.validateInputs.begin && this.validateInputs.end && this.validateInputs.break
+        });
+      }
+    }
+  },
   computed: {
-    nameOfDay: function nameOfDay() {
-      return days[index];
+    dayWorkingHours: function dayWorkingHours() {
+      return this.calculateWorkingHours(this.day);
+    },
+    validateInputs: function validateInputs() {
+      var checkTimeRelation = this.createDate(this.day.end) - this.createDate(this.day.begin) > 1000 * 60 * 60;
+      var checkBreak = this.calculateWorkingHours(this.day) > 6 && this.day.break >= 30 || this.calculateWorkingHours(this.day) <= 6 && this.day.break >= 0;
+      return {
+        break: checkBreak && this.isValid(this.day.break),
+        begin: checkTimeRelation && this.isValid(this.day.begin),
+        end: checkTimeRelation && this.isValid(this.day.end)
+      };
     }
   },
   methods: {
+    valitdateBeginBeforeEnd: function valitdateBeginBeforeEnd() {
+      if (this.createDate(this.day.end) - this.createDate(this.day.begin) > 1000 * 60 * 60) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    validateBreak: function validateBreak() {
+      if (this.calculateWorkingHours(this.day) > 6 && this.day.break >= 30 || this.calculateWorkingHours(this.day) <= 6 && this.day.break >= 0) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    setValidationMessages: function setValidationMessages() {
+      if (!this.valitdateBeginBeforeEnd() && this.isValid(this.day.begin) && this.isValid(this.day.end)) {
+        this.validationMessages.push("Am ".concat(this.day.name_of_day, " liegt der Begin der Arbeitszeit nicht Mindestens eine Stunde vor dem Ende"));
+      }
+
+      if (!this.validateBreak()) {
+        console.log('works');
+        this.validationMessages.push("Am ".concat(this.day.name_of_day, " muss die Arbeitszeit mindestens 30 Minute betragen"));
+      }
+
+      if (!this.isValid(this.day.begin)) {
+        this.validationMessages.push("Am ".concat(this.day.name_of_day, " ist der Anfang nicht vollst\xE4ndig gef\xFCllt"));
+      }
+
+      if (!this.isValid(this.day.end)) {
+        this.validationMessages.push("Am ".concat(this.day.name_of_day, " ist das Ende nicht vollst\xE4ndig gef\xFCllt"));
+      }
+
+      if (!this.isValid(this.day.break)) {
+        this.validationMessages.push("Am ".concat(this.day.name_of_day, " ist die Pause nicht vollst\xE4ndig gef\xFCllt"));
+      }
+    },
     arrayForScheduleData: function arrayForScheduleData(field) {
-      return "day[".concat(this.day, "][").concat(field, "]");
+      return "day[".concat(this.day.day, "][").concat(field, "]");
     },
     isValid: function isValid(value) {
       return value != "";
     },
     invalidClass: function invalidClass(value) {
       return {
-        'is-invalid': !this.isValid(value)
+        'is-invalid': !value && this.validate
       };
+    },
+    createDate: function createDate(time) {
+      return new Date('2000-01-01 ' + time);
+    },
+    calculateWorkingHours: function calculateWorkingHours(currentDay) {
+      return Math.round((this.createDate(currentDay.end) - this.createDate(currentDay.begin) - currentDay.break * 60 * 1000) / 1000 / 60 / 60 * 4) / 4;
+    },
+    valueChanged: function valueChanged(value) {
+      /*
+      this.day.workingHours = this.dayWorkingHours;
+      this.$emit('valueChanged',
+                  {'day': this.day.day,
+                   'workingHours': this.day.workingHours,
+                   'inputsValid': this.validateInputs.begin &&
+                                  this.validateInputs.end &&
+                                  this.validateInputs.break
+                  });*/
     }
   }
 });
@@ -37033,13 +37152,38 @@ var render = function() {
     [
       _vm._m(0),
       _vm._v(" "),
-      _vm._l(_vm.schedule, function(day, key) {
-        return _c("schedule-inputs", { key: key, attrs: { singleday: day } })
-      }),
-      _vm._v(" "),
       _vm._m(1),
       _vm._v(" "),
-      _vm._m(2)
+      _vm._l(_vm.currentSchedule, function(day, key) {
+        return _c("schedule-inputs", {
+          key: key,
+          attrs: { singleday: day, validate: _vm.validate },
+          on: { validationResult: _vm.updateWorkingHours }
+        })
+      }),
+      _vm._v(" "),
+      _vm.inputNeedsValidationMessage
+        ? _c("div", { staticClass: "alert alert-danger mt-2" }, [
+            _vm._m(2),
+            _vm._v(" "),
+            _vm._m(3)
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-primary mt-3",
+          attrs: { name: "ready" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              return _vm.startValidation($event)
+            }
+          }
+        },
+        [_vm._v("Ändern")]
+      )
     ],
     2
   )
@@ -37061,43 +37205,115 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("h3", [_vm._v("Schritt 1")]),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-primary",
-          attrs: { value: "false", name: "ready" }
-        },
-        [_vm._v("Ändern")]
-      )
+    return _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "exampleModalCenter",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "exampleModalCenterTitle",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-dialog-centered",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _c("div", { staticClass: "modal-header" }, [
+                _c(
+                  "h5",
+                  {
+                    staticClass: "modal-title",
+                    attrs: { id: "exampleModalLongTitle" }
+                  },
+                  [_vm._v("Modal title")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "close",
+                    attrs: {
+                      type: "button",
+                      "data-dismiss": "modal",
+                      "aria-label": "Close"
+                    }
+                  },
+                  [
+                    _c("span", { attrs: { "aria-hidden": "true" } }, [
+                      _vm._v("×")
+                    ])
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _vm._v("\n                ...\n            ")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" }
+                  },
+                  [_vm._v("Close")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  { staticClass: "btn btn-primary", attrs: { type: "button" } },
+                  [_vm._v("Save changes")]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("p", [
+      _c("strong", [_vm._v("Bitte korrigieren Sie Ihre Eingabe")]),
+      _c("br")
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("h3", [_vm._v("Schritt 2")]),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-primary",
-          attrs: { value: "true", name: "ready" }
-        },
-        [_vm._v("Speichern")]
+    return _c("p", [
+      _vm._v(
+        "\n            Bitte prüfen Sie die rot umrandeten Eingabefelder. Folgende Gründe kann diese Meldung haben:\n            "
       ),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-secondary",
-          attrs: { value: "false", name: "ready" }
-        },
-        [_vm._v("Ändern")]
-      )
+      _c("ul", [
+        _c("li", [
+          _vm._v("Das Feld enthält keinen oder einen unvollständigen Wert.")
+        ]),
+        _vm._v(" "),
+        _c("li", [
+          _vm._v(
+            "Die Zeit im Feld Anfang liegt nicht mindestens eine Stunde vor der Zeit im Feld Ende."
+          )
+        ]),
+        _vm._v(" "),
+        _c("li", [
+          _vm._v(
+            "Der Wert im Feld Pause ist unter 30 Minuten und die Arbeitszeit des Tages liegt über 6 Stunden."
+          )
+        ])
+      ])
     ])
   }
 ]
@@ -37123,28 +37339,28 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "row" }, [
-    _vm.dayActive
+    _vm.day.active
       ? _c("div", { staticClass: "col-sm-2" }, [
-          _c("p", [_vm._v(_vm._s(_vm.singleday.name_of_day))])
+          _c("p", [_vm._v(_vm._s(_vm.day.name_of_day))])
         ])
       : _vm._e(),
     _vm._v(" "),
     _c("input", {
       attrs: { type: "hidden", name: _vm.arrayForScheduleData("day") },
-      domProps: { value: _vm.singleday.day }
+      domProps: { value: _vm.day.day }
     }),
     _vm._v(" "),
     _c("input", {
       attrs: { type: "hidden", name: _vm.arrayForScheduleData("user_id") },
-      domProps: { value: _vm.singleday.user_id }
+      domProps: { value: _vm.day.user_id }
     }),
     _vm._v(" "),
     _c("input", {
       attrs: { type: "hidden", name: _vm.arrayForScheduleData("version") },
-      domProps: { value: _vm.singleday.version }
+      domProps: { value: _vm.day.version }
     }),
     _vm._v(" "),
-    _vm.dayActive
+    _vm.day.active
       ? _c("div", { staticClass: "form-group col-sm-4" }, [
           _c(
             "label",
@@ -37160,39 +37376,39 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.dayBegin,
-                expression: "dayBegin"
+                value: _vm.day.begin,
+                expression: "day.begin"
               }
             ],
             staticClass: "form-control",
-            class: _vm.invalidClass(_vm.dayBegin),
+            class: _vm.invalidClass(_vm.validateInputs.begin),
             attrs: {
               title: "begin",
               type: "time",
               name: _vm.arrayForScheduleData("begin"),
               id: _vm.arrayForScheduleData("begin")
             },
-            domProps: { value: _vm.dayBegin },
+            domProps: { value: _vm.day.begin },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.dayBegin = $event.target.value
+                _vm.$set(_vm.day, "begin", $event.target.value)
               }
             }
           })
         ])
       : _vm._e(),
     _vm._v(" "),
-    !_vm.dayActive
+    !_vm.day.active
       ? _c("input", {
           attrs: { type: "hidden", name: _vm.arrayForScheduleData("begin") },
-          domProps: { value: _vm.dayBegin }
+          domProps: { value: _vm.day.begin }
         })
       : _vm._e(),
     _vm._v(" "),
-    _vm.dayActive
+    _vm.day.active
       ? _c("div", { staticClass: "form-group  col-sm-4" }, [
           _c(
             "label",
@@ -37208,39 +37424,39 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.dayEnd,
-                expression: "dayEnd"
+                value: _vm.day.end,
+                expression: "day.end"
               }
             ],
             staticClass: "form-control",
-            class: _vm.invalidClass(_vm.dayEnd),
+            class: _vm.invalidClass(_vm.validateInputs.end),
             attrs: {
               title: "end",
               type: "time",
               name: _vm.arrayForScheduleData("end"),
               id: _vm.arrayForScheduleData("end")
             },
-            domProps: { value: _vm.dayEnd },
+            domProps: { value: _vm.day.end },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.dayEnd = $event.target.value
+                _vm.$set(_vm.day, "end", $event.target.value)
               }
             }
           })
         ])
       : _vm._e(),
     _vm._v(" "),
-    !_vm.dayActive
+    !_vm.day.active
       ? _c("input", {
           attrs: { type: "hidden", name: _vm.arrayForScheduleData("end") },
-          domProps: { value: _vm.dayEnd }
+          domProps: { value: _vm.day.end }
         })
       : _vm._e(),
     _vm._v(" "),
-    _vm.dayActive
+    _vm.day.active
       ? _c("div", { staticClass: "form-group col-sm-2" }, [
           _c(
             "label",
@@ -37256,35 +37472,35 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.dayBreak,
-                expression: "dayBreak"
+                value: _vm.day.break,
+                expression: "day.break"
               }
             ],
             staticClass: "form-control",
-            class: _vm.invalidClass(_vm.dayBreak),
+            class: _vm.invalidClass(_vm.validateInputs.break),
             attrs: {
               title: "break",
               type: "number",
               name: _vm.arrayForScheduleData("break"),
               id: _vm.arrayForScheduleData("end")
             },
-            domProps: { value: _vm.dayBreak },
+            domProps: { value: _vm.day.break },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.dayBreak = $event.target.value
+                _vm.$set(_vm.day, "break", $event.target.value)
               }
             }
           })
         ])
       : _vm._e(),
     _vm._v(" "),
-    !_vm.dayActive
+    !_vm.day.active
       ? _c("input", {
           attrs: { type: "hidden", name: _vm.arrayForScheduleData("break") },
-          domProps: { value: _vm.dayBreak }
+          domProps: { value: _vm.day.break }
         })
       : _vm._e()
   ])
