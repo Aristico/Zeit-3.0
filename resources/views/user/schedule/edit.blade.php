@@ -6,9 +6,10 @@
    <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">Arbeitszeiten bearbeiten</div>
+                <div class="card-header">Arbeitszeiten bearbeiten
+                </div>
 
-                <div class="card-body">
+                <div class="card-body pt-1">
                     {!! Form::open(['action'=>['ScheduleController@update'], 'method' => 'put']) !!}
                         <schedule-form :schedule="{{ $schedule }}"></schedule-form>
                     {!! Form::close() !!}

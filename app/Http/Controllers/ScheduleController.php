@@ -117,6 +117,7 @@ class ScheduleController extends Controller
      */
     public function update(Request $request)
     {
+
         $id = Auth::User()->id;
 
 

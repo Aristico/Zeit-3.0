@@ -1787,6 +1787,63 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleDaySelector.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ScheduleDaySelector.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['dayActive', 'dayNameOf', 'item'],
+  data: function data() {
+    return {
+      active: this.dayActive,
+      name: this.dayNameOf,
+      itemKey: this.item,
+      activeClass: ''
+    };
+  },
+  computed: {
+    activityClass: function activityClass() {
+      if (this.active === true) {
+        return 'badge-primary';
+      } else {
+        return 'badge-secondary';
+      }
+    }
+  },
+  methods: {
+    toggleDayActive: function toggleDayActive() {
+      this.active = !this.active;
+      this.$emit('toggleDay', {
+        'key': this.itemKey,
+        'active': this.active
+      });
+    },
+    setActiveClass: function setActiveClass() {
+      if (this.dayActive === true) {
+        this.activeClass = 'badge-primary';
+      } else {
+        this.activeClass = 'badge-secondary';
+      }
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleForm.vue?vue&type=script&lang=js&":
 /*!***********************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ScheduleForm.vue?vue&type=script&lang=js& ***!
@@ -1796,6 +1853,33 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -1846,40 +1930,70 @@ __webpack_require__.r(__webpack_exports__);
   props: ['csrf', 'schedule'],
   data: function data() {
     return {
-      currentSchedule: this.schedule,
+      currentSchedule: [],
       sumOfWorkingHours: 0,
       validate: false,
+      validationsSuccessfull: false,
+      validationMessages: [],
       inputsValid: [],
       inputNeedsValidationMessage: false
     };
   },
+  computed: {
+    validationFailed: function validationFailed() {
+      return this.validationMessages.length > 0;
+    }
+  },
   methods: {
-    startValidation: function startValidation() {
-      this.validate = true;
-    },
-    createDate: function createDate(time) {
-      return new Date('2000-01-01 ' + time);
-    },
-    calculateWorkingHours: function calculateWorkingHours(currentDay) {
-      return Math.round((this.createDate(currentDay.end) - this.createDate(currentDay.begin) - currentDay.break * 60 * 1000) / 1000 / 60 / 60 * 4) / 4;
-    },
-    updateWorkingHours: function updateWorkingHours(values) {
-      /*this.currentSchedule[values.day-1].workingHours = values.workingHours;
-      this.inputsValid[values.day-1] = values.inputsValid;
-       let sum = 0;
-      this.currentSchedule.forEach(element => {
-          element.workingHours > 0 ? sum += element.workingHours : sum +=0 ;
+    calculateWorkingHours: function calculateWorkingHours() {
+      var sum = 0;
+      this.currentSchedule.forEach(function (element) {
+        sum += element.workingHours;
       });
-      this.sumOfWorkingHours = sum;
-       this.inputNeedsValidationMessage = false;
-      this.inputsValid.forEach(element => {
-          if (element === false) {this.inputNeedsValidationMessage = true;}
-      })
-      */
+      return sum;
+    },
+    startValidation: function startValidation() {
+      var _this = this;
+
+      this.validationMessages = [];
+      this.validate = true;
+      setTimeout(function () {
+        _this.validate = false;
+
+        if (_this.validationFailed === false) {
+          console.log('if this ' + _this.validationFailed);
+          _this.validationsSuccessfull = true;
+        } else {
+          console.log('else ' + _this.validationFailed);
+          _this.validationsSuccessfull = false;
+        }
+      }, 250);
+    },
+    resetValidation: function resetValidation() {
+      this.validationsSuccessfull = false;
+    },
+    computeValidationResults: function computeValidationResults(values) {
+      this.currentSchedule[values.day.day - 1].workingHours = values.day.workingHours;
+      this.validationMessages.push.apply(this.validationMessages, values.validationMessages);
+      this.validationMessages = _toConsumableArray(new Set(this.validationMessages));
+      this.sumOfWorkingHours = this.calculateWorkingHours();
+    },
+    toggleDay: function toggleDay(values) {
+      this.currentSchedule[values.key].active = values.active;
+    },
+    copyPropObject: function copyPropObject(src) {
+      return Object.assign({}, src);
+    },
+    copyPropArray: function copyPropArray(src) {
+      return array.assign([], src);
     }
   },
   created: function created() {
-    /*let sum = 0;*/
+    var _this2 = this;
+
+    this.schedule.forEach(function (element) {
+      _this2.currentSchedule.push(_this2.copyPropObject(element));
+    });
     this.currentSchedule.forEach(function (element) {
       if (element.begin === null) {
         element.active = false;
@@ -1888,10 +2002,6 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       element.workingHours = 0;
-      /*this.calculateWorkingHours(element);*/
-
-      /*element.workingHours > 0 ? sum += element.workingHours : sum +=0 ;
-      this.sumOfWorkingHours = sum;*/
     });
   }
 });
@@ -1954,86 +2064,119 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['singleday', 'validate'],
+  props: ['singleday', 'validate', 'validationSuccess'],
   data: function data() {
     return {
-      day: this.singleday,
-      validationMessages: []
+      dayActive: this.singleday.active,
+      dayBegin: this.singleday.begin,
+      dayEnd: this.singleday.end,
+      dayBreak: this.singleday.break,
+      validationMessages: [],
+      workingHours: 0,
+      validationResult: {
+        'break': true,
+        'begin': true,
+        'end': true
+      }
     };
   },
+
+  /*
+  created () {
+    this.day = this.copyPropObject(this.singleday);
+  },*/
   watch: {
     validate: function validate() {
-      if (this.validate === true && this.day.active) {
+      if (this.validate === true && this.dayActive) {
+        this.validateInputs();
         this.setValidationMessages();
-        this.day.workingHours = this.dayWorkingHours;
+        this.workingHours = this.dayWorkingHours;
         this.$emit('validationResult', {
-          'singleDay': this.day,
-          'inputsValid': this.validateInputs.begin && this.validateInputs.end && this.validateInputs.break
+          'day': this.dayInformation,
+          'validationMessages': this.validationMessages
         });
       }
+    },
+    'singleday.active': function singledayActive() {
+      console.log('this.singleday.active');
     }
   },
   computed: {
     dayWorkingHours: function dayWorkingHours() {
-      return this.calculateWorkingHours(this.day);
+      if (this.validationResult.begin && this.validationResult.end && this.validationResult.break) {
+        return this.calculateWorkingHours(this.dayInformation);
+      } else {
+        return null;
+      }
     },
-    validateInputs: function validateInputs() {
-      var checkTimeRelation = this.createDate(this.day.end) - this.createDate(this.day.begin) > 1000 * 60 * 60;
-      var checkBreak = this.calculateWorkingHours(this.day) > 6 && this.day.break >= 30 || this.calculateWorkingHours(this.day) <= 6 && this.day.break >= 0;
+    dayInformation: function dayInformation() {
       return {
-        break: checkBreak && this.isValid(this.day.break),
-        begin: checkTimeRelation && this.isValid(this.day.begin),
-        end: checkTimeRelation && this.isValid(this.day.end)
+        'begin': this.dayBegin,
+        'end': this.dayEnd,
+        'break': this.dayBreak,
+        'workingHours': this.workingHours,
+        'day': this.singleday.day,
+        'active': this.singleday.active
       };
     }
   },
   methods: {
+    validateInputs: function validateInputs() {
+      var checkTimeRelation = this.createDate(this.dayEnd) - this.createDate(this.dayBegin) > 1000 * 60 * 60;
+      var checkBreak = this.calculateWorkingHours(this.dayInformation) > 6 && this.dayBreak >= 30 || this.calculateWorkingHours(this.dayInformation) <= 6 && this.dayBreak >= 0;
+      this.validationResult.break = checkBreak && this.isValid(this.dayBreak), this.validationResult.begin = checkTimeRelation && this.isValid(this.dayBegin), this.validationResult.end = checkTimeRelation && this.isValid(this.dayEnd);
+    },
     valitdateBeginBeforeEnd: function valitdateBeginBeforeEnd() {
-      if (this.createDate(this.day.end) - this.createDate(this.day.begin) > 1000 * 60 * 60) {
+      if (this.createDate(this.dayEnd) - this.createDate(this.dayBegin) > 1000 * 60 * 60) {
         return true;
       } else {
         return false;
       }
     },
     validateBreak: function validateBreak() {
-      if (this.calculateWorkingHours(this.day) > 6 && this.day.break >= 30 || this.calculateWorkingHours(this.day) <= 6 && this.day.break >= 0) {
+      if (this.calculateWorkingHours(this.dayInformation) > 6 && this.dayBreak >= 30 || this.calculateWorkingHours(this.dayInformation) <= 6 && this.dayBreak >= 0) {
         return true;
       } else {
         return false;
       }
     },
     setValidationMessages: function setValidationMessages() {
-      if (!this.valitdateBeginBeforeEnd() && this.isValid(this.day.begin) && this.isValid(this.day.end)) {
-        this.validationMessages.push("Am ".concat(this.day.name_of_day, " liegt der Begin der Arbeitszeit nicht Mindestens eine Stunde vor dem Ende"));
+      this.validationMessages = [];
+
+      if (!this.valitdateBeginBeforeEnd() && this.isValid(this.dayBegin) && this.isValid(this.dayEnd)) {
+        this.validationMessages.push("Am ".concat(this.singleday.name_of_day, " liegt der Begin der Arbeitszeit nicht Mindestens eine Stunde vor dem Ende"));
       }
 
-      if (!this.validateBreak()) {
+      if (!this.validateBreak() && this.isValid(this.dayBreak)) {
         console.log('works');
-        this.validationMessages.push("Am ".concat(this.day.name_of_day, " muss die Arbeitszeit mindestens 30 Minute betragen"));
+        this.validationMessages.push("Am ".concat(this.singleday.name_of_day, " muss die Pause mindestens 30 Minute betragen"));
       }
 
-      if (!this.isValid(this.day.begin)) {
-        this.validationMessages.push("Am ".concat(this.day.name_of_day, " ist der Anfang nicht vollst\xE4ndig gef\xFCllt"));
+      if (!this.isValid(this.dayBegin)) {
+        this.validationMessages.push("Am ".concat(this.singleday.name_of_day, " ist der Anfang nicht vollst\xE4ndig gef\xFCllt"));
       }
 
-      if (!this.isValid(this.day.end)) {
-        this.validationMessages.push("Am ".concat(this.day.name_of_day, " ist das Ende nicht vollst\xE4ndig gef\xFCllt"));
+      if (!this.isValid(this.dayEnd)) {
+        this.validationMessages.push("Am ".concat(this.singleday.name_of_day, " ist das Ende nicht vollst\xE4ndig gef\xFCllt"));
       }
 
-      if (!this.isValid(this.day.break)) {
-        this.validationMessages.push("Am ".concat(this.day.name_of_day, " ist die Pause nicht vollst\xE4ndig gef\xFCllt"));
+      if (!this.isValid(this.dayBreak)) {
+        this.validationMessages.push("Am ".concat(this.singleday.name_of_day, " ist die Pause nicht vollst\xE4ndig gef\xFCllt"));
       }
     },
     arrayForScheduleData: function arrayForScheduleData(field) {
-      return "day[".concat(this.day.day, "][").concat(field, "]");
+      return "day[".concat(this.singleday.day, "][").concat(field, "]");
     },
     isValid: function isValid(value) {
       return value != "";
     },
     invalidClass: function invalidClass(value) {
       return {
-        'is-invalid': !value && this.validate
+        'is-invalid': !value
       };
     },
     createDate: function createDate(time) {
@@ -2042,16 +2185,8 @@ __webpack_require__.r(__webpack_exports__);
     calculateWorkingHours: function calculateWorkingHours(currentDay) {
       return Math.round((this.createDate(currentDay.end) - this.createDate(currentDay.begin) - currentDay.break * 60 * 1000) / 1000 / 60 / 60 * 4) / 4;
     },
-    valueChanged: function valueChanged(value) {
-      /*
-      this.day.workingHours = this.dayWorkingHours;
-      this.$emit('valueChanged',
-                  {'day': this.day.day,
-                   'workingHours': this.day.workingHours,
-                   'inputsValid': this.validateInputs.begin &&
-                                  this.validateInputs.end &&
-                                  this.validateInputs.break
-                  });*/
+    copyPropObject: function copyPropObject(src) {
+      return Object.assign({}, src);
     }
   }
 });
@@ -37132,6 +37267,40 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleDaySelector.vue?vue&type=template&id=47235c69&":
+/*!**********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ScheduleDaySelector.vue?vue&type=template&id=47235c69& ***!
+  \**********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c(
+      "span",
+      {
+        staticClass: "badge mr-1",
+        class: _vm.activityClass,
+        on: { click: _vm.toggleDayActive }
+      },
+      [_vm._v(_vm._s(_vm.name.substring(0, 2)))]
+    )
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleForm.vue?vue&type=template&id=16f3ee66&":
 /*!***************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ScheduleForm.vue?vue&type=template&id=16f3ee66& ***!
@@ -37150,6 +37319,25 @@ var render = function() {
   return _c(
     "div",
     [
+      _c(
+        "div",
+        {
+          staticClass: "row mb-3 alert alert-info d-flex justify-content-center"
+        },
+        _vm._l(_vm.currentSchedule, function(singleDay, key) {
+          return _c("schedule-day-selector", {
+            key: key,
+            attrs: {
+              item: key,
+              dayActive: singleDay.active,
+              dayNameOf: singleDay.name_of_day
+            },
+            on: { toggleDay: _vm.toggleDay }
+          })
+        }),
+        1
+      ),
+      _vm._v(" "),
       _vm._m(0),
       _vm._v(" "),
       _vm._m(1),
@@ -37157,33 +37345,76 @@ var render = function() {
       _vm._l(_vm.currentSchedule, function(day, key) {
         return _c("schedule-inputs", {
           key: key,
-          attrs: { singleday: day, validate: _vm.validate },
-          on: { validationResult: _vm.updateWorkingHours }
+          attrs: {
+            singleday: day,
+            validate: _vm.validate,
+            validationSuccess: _vm.validationsSuccessfull
+          },
+          on: { validationResult: _vm.computeValidationResults }
         })
       }),
       _vm._v(" "),
-      _vm.inputNeedsValidationMessage
+      _vm.validationFailed
         ? _c("div", { staticClass: "alert alert-danger mt-2" }, [
             _vm._m(2),
             _vm._v(" "),
-            _vm._m(3)
+            _c(
+              "ul",
+              _vm._l(_vm.validationMessages, function(message, key) {
+                return _c("li", { key: key }, [_vm._v(_vm._s(message))])
+              }),
+              0
+            )
           ])
         : _vm._e(),
       _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-primary mt-3",
-          attrs: { name: "ready" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              return _vm.startValidation($event)
-            }
-          }
-        },
-        [_vm._v("Ändern")]
-      )
+      _vm.validationsSuccessfull
+        ? _c("div", { staticClass: "alert alert-success mt-1" }, [
+            _vm._v(
+              "\n        Mit den von Ihnen gemachten Angaben ergibt sich eine Wochenarbeitszeit von " +
+                _vm._s(_vm.sumOfWorkingHours) +
+                " Stunden.\n    "
+            )
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      !_vm.validationsSuccessfull
+        ? _c(
+            "button",
+            {
+              staticClass: "btn btn-primary mt-1",
+              on: {
+                click: function($event) {
+                  $event.preventDefault()
+                  return _vm.startValidation($event)
+                }
+              }
+            },
+            [_vm._v("Prüfen")]
+          )
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.validationsSuccessfull
+        ? _c(
+            "button",
+            {
+              staticClass: "btn btn-secondary mt-1",
+              on: {
+                click: function($event) {
+                  $event.preventDefault()
+                  return _vm.resetValidation($event)
+                }
+              }
+            },
+            [_vm._v("Zurück")]
+          )
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.validationsSuccessfull
+        ? _c("button", { staticClass: "btn btn-primary mt-1" }, [
+            _vm._v("Speichern")
+          ])
+        : _vm._e()
     ],
     2
   )
@@ -37288,33 +37519,6 @@ var staticRenderFns = [
       _c("strong", [_vm._v("Bitte korrigieren Sie Ihre Eingabe")]),
       _c("br")
     ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("p", [
-      _vm._v(
-        "\n            Bitte prüfen Sie die rot umrandeten Eingabefelder. Folgende Gründe kann diese Meldung haben:\n            "
-      ),
-      _c("ul", [
-        _c("li", [
-          _vm._v("Das Feld enthält keinen oder einen unvollständigen Wert.")
-        ]),
-        _vm._v(" "),
-        _c("li", [
-          _vm._v(
-            "Die Zeit im Feld Anfang liegt nicht mindestens eine Stunde vor der Zeit im Feld Ende."
-          )
-        ]),
-        _vm._v(" "),
-        _c("li", [
-          _vm._v(
-            "Der Wert im Feld Pause ist unter 30 Minuten und die Arbeitszeit des Tages liegt über 6 Stunden."
-          )
-        ])
-      ])
-    ])
   }
 ]
 render._withStripped = true
@@ -37339,28 +37543,28 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "row" }, [
-    _vm.day.active
+    _vm.singleday.active
       ? _c("div", { staticClass: "col-sm-2" }, [
-          _c("p", [_vm._v(_vm._s(_vm.day.name_of_day))])
+          _c("p", [_vm._v(_vm._s(_vm.singleday.name_of_day))])
         ])
       : _vm._e(),
     _vm._v(" "),
     _c("input", {
       attrs: { type: "hidden", name: _vm.arrayForScheduleData("day") },
-      domProps: { value: _vm.day.day }
+      domProps: { value: _vm.singleday.day }
     }),
     _vm._v(" "),
     _c("input", {
       attrs: { type: "hidden", name: _vm.arrayForScheduleData("user_id") },
-      domProps: { value: _vm.day.user_id }
+      domProps: { value: _vm.singleday.user_id }
     }),
     _vm._v(" "),
     _c("input", {
       attrs: { type: "hidden", name: _vm.arrayForScheduleData("version") },
-      domProps: { value: _vm.day.version }
+      domProps: { value: _vm.singleday.version }
     }),
     _vm._v(" "),
-    _vm.day.active
+    _vm.singleday.active
       ? _c("div", { staticClass: "form-group col-sm-4" }, [
           _c(
             "label",
@@ -37376,39 +37580,40 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.day.begin,
-                expression: "day.begin"
+                value: _vm.dayBegin,
+                expression: "dayBegin"
               }
             ],
             staticClass: "form-control",
-            class: _vm.invalidClass(_vm.validateInputs.begin),
+            class: _vm.invalidClass(_vm.validationResult.begin),
             attrs: {
               title: "begin",
               type: "time",
               name: _vm.arrayForScheduleData("begin"),
-              id: _vm.arrayForScheduleData("begin")
+              id: _vm.arrayForScheduleData("begin"),
+              readonly: _vm.validationSuccess
             },
-            domProps: { value: _vm.day.begin },
+            domProps: { value: _vm.dayBegin },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.$set(_vm.day, "begin", $event.target.value)
+                _vm.dayBegin = $event.target.value
               }
             }
           })
         ])
       : _vm._e(),
     _vm._v(" "),
-    !_vm.day.active
+    !_vm.singleday.active
       ? _c("input", {
           attrs: { type: "hidden", name: _vm.arrayForScheduleData("begin") },
-          domProps: { value: _vm.day.begin }
+          domProps: { value: null }
         })
       : _vm._e(),
     _vm._v(" "),
-    _vm.day.active
+    _vm.singleday.active
       ? _c("div", { staticClass: "form-group  col-sm-4" }, [
           _c(
             "label",
@@ -37424,39 +37629,40 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.day.end,
-                expression: "day.end"
+                value: _vm.dayEnd,
+                expression: "dayEnd"
               }
             ],
             staticClass: "form-control",
-            class: _vm.invalidClass(_vm.validateInputs.end),
+            class: _vm.invalidClass(_vm.validationResult.end),
             attrs: {
               title: "end",
               type: "time",
               name: _vm.arrayForScheduleData("end"),
-              id: _vm.arrayForScheduleData("end")
+              id: _vm.arrayForScheduleData("end"),
+              readonly: _vm.validationSuccess
             },
-            domProps: { value: _vm.day.end },
+            domProps: { value: _vm.dayEnd },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.$set(_vm.day, "end", $event.target.value)
+                _vm.dayEnd = $event.target.value
               }
             }
           })
         ])
       : _vm._e(),
     _vm._v(" "),
-    !_vm.day.active
+    !_vm.singleday.active
       ? _c("input", {
           attrs: { type: "hidden", name: _vm.arrayForScheduleData("end") },
-          domProps: { value: _vm.day.end }
+          domProps: { value: null }
         })
       : _vm._e(),
     _vm._v(" "),
-    _vm.day.active
+    _vm.singleday.active
       ? _c("div", { staticClass: "form-group col-sm-2" }, [
           _c(
             "label",
@@ -37472,35 +37678,36 @@ var render = function() {
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.day.break,
-                expression: "day.break"
+                value: _vm.dayBreak,
+                expression: "dayBreak"
               }
             ],
             staticClass: "form-control",
-            class: _vm.invalidClass(_vm.validateInputs.break),
+            class: _vm.invalidClass(_vm.validationResult.break),
             attrs: {
               title: "break",
               type: "number",
               name: _vm.arrayForScheduleData("break"),
-              id: _vm.arrayForScheduleData("end")
+              id: _vm.arrayForScheduleData("end"),
+              readonly: _vm.validationSuccess
             },
-            domProps: { value: _vm.day.break },
+            domProps: { value: _vm.dayBreak },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.$set(_vm.day, "break", $event.target.value)
+                _vm.dayBreak = $event.target.value
               }
             }
           })
         ])
       : _vm._e(),
     _vm._v(" "),
-    !_vm.day.active
+    !_vm.singleday.active
       ? _c("input", {
           attrs: { type: "hidden", name: _vm.arrayForScheduleData("break") },
-          domProps: { value: _vm.day.break }
+          domProps: { value: null }
         })
       : _vm._e()
   ])
@@ -49673,7 +49880,8 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
 Vue.component('example-component', __webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/js/components/ExampleComponent.vue"));
 Vue.component('schedule-inputs', __webpack_require__(/*! ./components/ScheduleInputs.vue */ "./resources/js/components/ScheduleInputs.vue").default);
-Vue.component('schedule-form', __webpack_require__(/*! ./components/ScheduleForm.vue */ "./resources/js/components/ScheduleForm.vue").default); // const files = require.context('./', true, /\.vue$/i)
+Vue.component('schedule-form', __webpack_require__(/*! ./components/ScheduleForm.vue */ "./resources/js/components/ScheduleForm.vue").default);
+Vue.component('schedule-day-selector', __webpack_require__(/*! ./components/ScheduleDaySelector.vue */ "./resources/js/components/ScheduleDaySelector.vue").default); // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => {
 //     return Vue.component(_.last(key.split('/')).split('.')[0], files(key))
 // })
@@ -49812,6 +50020,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ExampleComponent_vue_vue_type_template_id_299e239e___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ExampleComponent_vue_vue_type_template_id_299e239e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/ScheduleDaySelector.vue":
+/*!*********************************************************!*\
+  !*** ./resources/js/components/ScheduleDaySelector.vue ***!
+  \*********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ScheduleDaySelector_vue_vue_type_template_id_47235c69___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ScheduleDaySelector.vue?vue&type=template&id=47235c69& */ "./resources/js/components/ScheduleDaySelector.vue?vue&type=template&id=47235c69&");
+/* harmony import */ var _ScheduleDaySelector_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ScheduleDaySelector.vue?vue&type=script&lang=js& */ "./resources/js/components/ScheduleDaySelector.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _ScheduleDaySelector_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ScheduleDaySelector_vue_vue_type_template_id_47235c69___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _ScheduleDaySelector_vue_vue_type_template_id_47235c69___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/ScheduleDaySelector.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/ScheduleDaySelector.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************!*\
+  !*** ./resources/js/components/ScheduleDaySelector.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ScheduleDaySelector_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./ScheduleDaySelector.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleDaySelector.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ScheduleDaySelector_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/ScheduleDaySelector.vue?vue&type=template&id=47235c69&":
+/*!****************************************************************************************!*\
+  !*** ./resources/js/components/ScheduleDaySelector.vue?vue&type=template&id=47235c69& ***!
+  \****************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ScheduleDaySelector_vue_vue_type_template_id_47235c69___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./ScheduleDaySelector.vue?vue&type=template&id=47235c69& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ScheduleDaySelector.vue?vue&type=template&id=47235c69&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ScheduleDaySelector_vue_vue_type_template_id_47235c69___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ScheduleDaySelector_vue_vue_type_template_id_47235c69___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

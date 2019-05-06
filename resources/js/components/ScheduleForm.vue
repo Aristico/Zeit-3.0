@@ -1,5 +1,15 @@
 <template>
     <div>
+        <div class="row mb-3 alert alert-info d-flex justify-content-center">
+            <schedule-day-selector
+                v-for="(singleDay, key) in currentSchedule"
+                :key="key"
+                :item="key"
+                :dayActive="singleDay.active"
+                :dayNameOf="singleDay.name_of_day"
+                @toggleDay="toggleDay">
+            </schedule-day-selector>
+        </div>
         <div class="row">
             <p class="col-sm-4 offset-2">Anfang</p>
             <p class="col-sm-4">Ende</p>
@@ -26,20 +36,29 @@
             </div>
         </div>
 
-        <schedule-inputs @validationResult="updateWorkingHours" v-for="(day, key) in currentSchedule" :singleday="day" :key="key" :validate="validate"></schedule-inputs>
+        <schedule-inputs
+            @validationResult="computeValidationResults"
+            v-for="(day, key) in currentSchedule"
+            :singleday="day"
+            :key="key"
+            :validate="validate"
+            :validationSuccess="validationsSuccessfull"></schedule-inputs>
 
-        <div v-if="inputNeedsValidationMessage" class="alert alert-danger mt-2">
+        <div v-if="validationFailed" class="alert alert-danger mt-2">
             <p><strong>Bitte korrigieren Sie Ihre Eingabe</strong><br></p>
-            <p>
-                Bitte prüfen Sie die rot umrandeten Eingabefelder. Folgende Gründe kann diese Meldung haben:
                 <ul>
-                    <li>Das Feld enthält keinen oder einen unvollständigen Wert.</li>
-                    <li>Die Zeit im Feld Anfang liegt nicht mindestens eine Stunde vor der Zeit im Feld Ende.</li>
-                    <li>Der Wert im Feld Pause ist unter 30 Minuten und die Arbeitszeit des Tages liegt über 6 Stunden.</li>
+                    <li v-for="(message,key) in validationMessages" :key="key" >{{ message }}</li>
                 </ul>
-            </p>
         </div>
-        <button @click.prevent="startValidation" class="btn btn-primary mt-3" name="ready">Ändern</button>
+
+        <div v-if="validationsSuccessfull" class="alert alert-success mt-1">
+            Mit den von Ihnen gemachten Angaben ergibt sich eine Wochenarbeitszeit von {{ sumOfWorkingHours }} Stunden.
+        </div>
+
+        <button v-if="!validationsSuccessfull" @click.prevent="startValidation" class="btn btn-primary mt-1">Prüfen</button>
+
+        <button v-if="validationsSuccessfull" @click.prevent="resetValidation" class="btn btn-secondary mt-1">Zurück</button>
+        <button v-if="validationsSuccessfull" class="btn btn-primary mt-1">Speichern</button>
 
     </div>
 </template>
@@ -49,51 +68,74 @@ export default {
     props: ['csrf', 'schedule'],
     data () {
         return {
-            currentSchedule: this.schedule,
+            currentSchedule: [],
             sumOfWorkingHours: 0,
             validate: false,
+            validationsSuccessfull: false,
+            validationMessages: [],
             inputsValid: [],
             inputNeedsValidationMessage: false
         }
     },
+    computed: {
+        validationFailed () {
+            return this.validationMessages.length > 0;
+        }
+    },
     methods: {
-        startValidation () {
-            this.validate = true;
-        },
-        createDate (time) {
-            return new Date('2000-01-01 ' + time);
-        },
-        calculateWorkingHours (currentDay) {
-            return Math.round((this.createDate(currentDay.end) - this.createDate(currentDay.begin) - currentDay.break*60*1000)/1000/60/60*4)/4;
-        },
-        updateWorkingHours (values) {
-            /*this.currentSchedule[values.day-1].workingHours = values.workingHours;
-            this.inputsValid[values.day-1] = values.inputsValid;
-
+        calculateWorkingHours () {
             let sum = 0;
             this.currentSchedule.forEach(element => {
-                element.workingHours > 0 ? sum += element.workingHours : sum +=0 ;
-            });
-            this.sumOfWorkingHours = sum;
+                sum += element.workingHours;
 
-            this.inputNeedsValidationMessage = false;
-            this.inputsValid.forEach(element => {
-                if (element === false) {this.inputNeedsValidationMessage = true;}
-            })
-            */
+            });
+            return sum;
+        },
+        startValidation () {
+            this.validationMessages = [];
+            this.validate = true;
+            setTimeout(() => {
+                this.validate = false;
+                if (this.validationFailed === false) {
+                    console.log('if this ' + this.validationFailed);
+                    this.validationsSuccessfull = true;
+                } else {
+                    console.log('else ' + this.validationFailed);
+                    this.validationsSuccessfull = false;
+                }
+            },250)
+        },
+        resetValidation () {
+            this.validationsSuccessfull = false;
+        },
+        computeValidationResults (values) {
+            this.currentSchedule[values.day.day-1].workingHours = values.day.workingHours;
+            this.validationMessages.push.apply(this.validationMessages, values.validationMessages);
+            this.validationMessages = [...new Set(this.validationMessages)];
+            this.sumOfWorkingHours = this.calculateWorkingHours();
+        },
+        toggleDay(values) {
+            this.currentSchedule[values.key].active = values.active;
+        },
+        copyPropObject(src) {
+            return Object.assign({}, src);
+        },
+        copyPropArray(src) {
+            return array.assign([], src);
         }
     },
     created () {
-        /*let sum = 0;*/
+        this.schedule.forEach(element => {
+           this.currentSchedule.push(this.copyPropObject(element));
+        })
+
         this.currentSchedule.forEach(element => {
             if (element.begin === null) {
                 element.active = false;
             } else {
                 element.active = true;
             }
-            element.workingHours = 0; /*this.calculateWorkingHours(element);*/
-            /*element.workingHours > 0 ? sum += element.workingHours : sum +=0 ;
-            this.sumOfWorkingHours = sum;*/
+            element.workingHours = 0;
         })
     }
 }
