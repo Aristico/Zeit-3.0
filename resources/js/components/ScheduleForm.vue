@@ -41,6 +41,7 @@
             v-for="(day, key) in currentSchedule"
             :singleday="day"
             :key="key"
+            :userid="userid"
             :validate="validate"
             :validationSuccess="validationsSuccessfull"></schedule-inputs>
 
@@ -65,7 +66,7 @@
 
 <script>
 export default {
-    props: ['csrf', 'schedule'],
+    props: ['schedule','userid'],
     data () {
         return {
             currentSchedule: [],

@@ -1926,8 +1926,9 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['csrf', 'schedule'],
+  props: ['schedule', 'userid'],
   data: function data() {
     return {
       currentSchedule: [],
@@ -2066,7 +2067,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['singleday', 'validate', 'validationSuccess'],
+  props: ['singleday', 'userid', 'validate', 'validationSuccess'],
   data: function data() {
     return {
       day: this.singleday,
@@ -2092,6 +2093,13 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   computed: {
+    computedUserId: function computedUserId() {
+      if (this.userid === undefined) {
+        return this.day.user_id;
+      } else {
+        return this.userid;
+      }
+    },
     dayWorkingHours: function dayWorkingHours() {
       if (this.validationResult.begin && this.validationResult.end && this.validationResult.break) {
         var hours = Math.round((this.createDate(this.day.end) - this.createDate(this.day.begin) - this.day.break * 60 * 1000) / 1000 / 60 / 60 * 4) / 4;
@@ -37326,6 +37334,7 @@ var render = function() {
           key: key,
           attrs: {
             singleday: day,
+            userid: _vm.userid,
             validate: _vm.validate,
             validationSuccess: _vm.validationsSuccessfull
           },
@@ -37532,7 +37541,7 @@ var render = function() {
       _vm._v(" "),
       _c("input", {
         attrs: { type: "hidden", name: _vm.arrayForScheduleData("user_id") },
-        domProps: { value: _vm.day.user_id }
+        domProps: { value: _vm.computedUserId }
       }),
       _vm._v(" "),
       _c("input", {

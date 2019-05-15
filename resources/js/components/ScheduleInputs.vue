@@ -1,7 +1,7 @@
 <template>
         <div class="row">
             <input type="hidden" :name="arrayForScheduleData('day')" :value="day.day">
-            <input type="hidden" :name="arrayForScheduleData('user_id')" :value="day.user_id">
+            <input type="hidden" :name="arrayForScheduleData('user_id')" :value="computedUserId">
             <input type="hidden" :name="arrayForScheduleData('version')" :value="day.version">
 
             <template v-if="day.day_active">
@@ -54,7 +54,7 @@
 
 <script>
 export default {
-    props: ['singleday', 'validate', 'validationSuccess'],
+    props: ['singleday', 'userid', 'validate', 'validationSuccess'],
     data () {
         return {
             day: this.singleday,
@@ -80,6 +80,13 @@ export default {
 
     },
     computed: {
+        computedUserId () {
+            if (this.userid === undefined) {
+                return this.day.user_id;
+            } else {
+                return this.userid;
+            }
+        },
         dayWorkingHours () {
             if (this.validationResult.begin && this.validationResult.end && this.validationResult.break) {
 

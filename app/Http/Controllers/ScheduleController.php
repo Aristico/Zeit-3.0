@@ -48,9 +48,9 @@ class ScheduleController extends Controller
         } else {
 
             /*Lädt die Standard-Arbeitszeiten und üerzeut ein Array mit den enthaltenen Tagen.*/
-            $defaults = Schedule::where('user_id', 1)->orderBy('day', 'asc')->get();
+            $schedule = Schedule::where('user_id', 1)->orderBy('day', 'asc')->get();
             /*Zeigt das mit den Standardzeiten Vorausgefüllte Formular.*/
-            return view('user.schedule.create', compact('days', 'defaults', 'id'));
+            return view('user.schedule.create', compact('days', 'schedule', 'id'));
 
         }
     }
@@ -66,28 +66,26 @@ class ScheduleController extends Controller
         /*Sammelt den Input ein und setzt die zu Berechnende Arbeitszeit auf 0*/
         /*Der Input besteht aus einem Array mit sieben Feldern. Für jeden Tag eines.*/
         $input = $request->all();
-        $hours = 0;
 
         /* Geht das Array durch und legt für jeden Tag einen Datenbank-Eintrag an
          * Berechnet aus der Rückmeldung der Anlage die Arbeitszeit des Tages und Addiert die Stunden jedes Tages zu
          * Einer Wochenarbeitszeit.
          */
         foreach ($input['day'] as $day) {
-
             $schedule = Schedule::create($day);
-            $hours += $schedule->regularHours();
+
         }
 
         /* Erzeugt die Erfolgsmeldung für den folgenden Screen
          * Die Session info "success" wird dafür benutzt um bestimmte Buttons ein/auszublenden.
          * */
-        session()->flash('info_message', 'Bitte prüfen Sie Ihre Wochenarbeitszeit. Ihre Angabe führen zu einer Wochenarbeitszeit von ' . $hours . ' Stunden.');
+        session()->flash('info_message', 'Ihr Zeitplan wurde gespeichert');
         session()->flash('success', 'true');
 
         /* Als nächstes wird das Edit-Fenster angezeigt.
          * Hier wird die berechnete Arbeitszeit ausgewiesen und kann ggf. nochmal geändert werden.
          * */
-        return redirect(route('schedule.edit'));
+        return redirect(route('start'));
 
     }
 
@@ -119,7 +117,6 @@ class ScheduleController extends Controller
     {
 
         $id = Auth::User()->id;
-
 
         /* Beim ersten Aufruf und wenn nochmal geändert wurde, wird dieser Bereich abgespielt.
             * Stunden werden für die Berechnung auf 0 gesetzt
