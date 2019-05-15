@@ -5,7 +5,7 @@
                 v-for="(singleDay, key) in currentSchedule"
                 :key="key"
                 :item="key"
-                :dayActive="singleDay.active"
+                :dayActive="singleDay.day_active"
                 :dayNameOf="singleDay.name_of_day"
                 @toggleDay="toggleDay">
             </schedule-day-selector>
@@ -81,7 +81,7 @@ export default {
         validationFailed () {
             return this.validationMessages.length > 0;
         }
-    },
+     },
     methods: {
         calculateWorkingHours () {
             let sum = 0;
@@ -103,7 +103,7 @@ export default {
                     console.log('else ' + this.validationFailed);
                     this.validationsSuccessfull = false;
                 }
-            },250)
+            },1000)
         },
         resetValidation () {
             this.validationsSuccessfull = false;
@@ -115,7 +115,7 @@ export default {
             this.sumOfWorkingHours = this.calculateWorkingHours();
         },
         toggleDay(values) {
-            this.currentSchedule[values.key].active = values.active;
+            this.currentSchedule[values.key].day_active = values.active;
         },
         copyPropObject(src) {
             return Object.assign({}, src);
@@ -130,11 +130,6 @@ export default {
         })
 
         this.currentSchedule.forEach(element => {
-            if (element.begin === null) {
-                element.active = false;
-            } else {
-                element.active = true;
-            }
             element.workingHours = 0;
         })
     }

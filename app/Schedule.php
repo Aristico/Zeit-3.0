@@ -19,7 +19,7 @@ class Schedule extends Model
 
     ];
 
-    protected $appends = ['name_of_day'];
+    protected $appends = ['name_of_day', 'day_active'];
 
 
     public function regularHours () {
@@ -41,6 +41,15 @@ class Schedule extends Model
     {
         $days = [1 => 'Montag', 2 => 'Dienstag', 3 => 'Mittwoch', 4 => 'Donnerstag', 5 => 'Freitag', 6 => 'Samstag', 7 => 'Sonntag'];
         return $days[$this->day];
+    }
+
+    public function getDayActiveAttribute () {
+        if ($this->begin == NULL) {
+            return false;
+        } else {
+            return true;
+        }
+
     }
 
 }
