@@ -127,18 +127,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 
+Route::get('/entries/init', 'EntryController@initShow')->name('entries.init.show');
+Route::post('/entries/init/set', 'EntryController@initSet')->name('entries.init.set');
+
 Route::get('/entries/{id}/delete', 'EntryController@delete')->name('entries.delete');
 Route::get('/entries/{date}/create', 'EntryController@create')->name('entries.create');
+
+Route::get('/entries/{id}/correction/add', 'EntryController@showCorrection')->name('entries.correction.add');
+Route::put('/entries/{id}/correction/set', 'EntryController@setCorrection')->name('entries.correction.set');
 
 Route::get('/entries/index/{year}/{month}', 'EntryController@index')->name('entries.index.month');
 Route::get('/entries/index/{year}/{month}/statement', 'EntryController@createOvertimeStatement')->name('entries.index.month.statement');
 
 Route::get('/entries/index/balances', 'EntryController@balanceEndOfMonth')->name('entries.index.balances');
-
-
-
-Route::get('/entries/init', 'EntryController@initShow')->name('entries.init.show');
-Route::post('/entries/init/set', 'EntryController@initSet')->name('entries.init.set');
 
 Route::resource('/entries', 'EntryController')->except('create');
 
@@ -151,12 +152,6 @@ Route::resource('/user', 'UserController')->except('edit', 'update', 'delete', '
 
 Route::any('/entries/{identifier}/enter', 'EntryController@enter')->name('entries.enter');
 Route::any('/entries/{identifier}/leave', 'EntryController@leave')->name('entries.leave');
-
-Route::get('/start', function () {
-
-    return view('user.home');
-
-})->name('start');
 
 Route::get('/start', function () {
 

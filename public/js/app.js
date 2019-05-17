@@ -37383,6 +37383,12 @@ var render = function() {
         : _vm._e(),
       _vm._v(" "),
       _vm.validationsSuccessfull
+        ? _c("button", { staticClass: "btn btn-primary mt-1" }, [
+            _vm._v("Speichern")
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.validationsSuccessfull
         ? _c(
             "button",
             {
@@ -37396,12 +37402,6 @@ var render = function() {
             },
             [_vm._v("Zurück")]
           )
-        : _vm._e(),
-      _vm._v(" "),
-      _vm.validationsSuccessfull
-        ? _c("button", { staticClass: "btn btn-primary mt-1" }, [
-            _vm._v("Speichern")
-          ])
         : _vm._e()
     ],
     2

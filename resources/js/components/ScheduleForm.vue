@@ -58,8 +58,8 @@
 
         <button v-if="!validationsSuccessfull" @click.prevent="startValidation" class="btn btn-primary mt-1">Prüfen</button>
 
-        <button v-if="validationsSuccessfull" @click.prevent="resetValidation" class="btn btn-secondary mt-1">Zurück</button>
         <button v-if="validationsSuccessfull" class="btn btn-primary mt-1">Speichern</button>
+        <button v-if="validationsSuccessfull" @click.prevent="resetValidation" class="btn btn-secondary mt-1">Zurück</button>
 
     </div>
 </template>

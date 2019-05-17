@@ -19,7 +19,8 @@ class Entry extends Model
         'overtime',
         'balance',
         'schedule_version',
-        'comment'
+        'comment',
+        'correction'
     ];
 
     public function calculateHours($start, $end, $break) {
@@ -53,6 +54,25 @@ class Entry extends Model
 
     }
 
+    public function getIsEditableAttribute () {
 
+        $correctionsInFuture =  $this
+                                ->orderBy('date', 'asc')
+                                ->where([['date', '>=', $this->date],
+                                         ['correction', '!=', null]])
+                                        ->get();
 
+        return count($correctionsInFuture) > 0 ? false : true;
+    }
+
+    public function getIsCorrectableAttribute () {
+
+        $correctionsInFuture =  $this
+                                ->orderBy('date', 'asc')
+                                ->where([['date', '>', $this->date],
+                                         ['correction', '!=', null]])
+                                        ->get();
+
+        return count($correctionsInFuture) > 0 ? false : true;
+    }
 }

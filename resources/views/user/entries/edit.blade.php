@@ -22,31 +22,36 @@
 
                         <div class="form-group">
                            {!! Form::label('begin', 'Anfang') !!}
-                           {!! Form::time('begin', $entry->beginCarbon()->format('H:i'), ['title'=>'begin', 'class'=>'form-control'] ) !!}
+                           {!! Form::time('begin', $entry->beginCarbon()->format('H:i'), ['title'=>'begin', 'class'=>'form-control', $entry->isEditable ? '' : 'readonly'] ) !!}
                         </div>
                         @include('includes.error', ['field'=>'begin'])
 
                         <div class="form-group">
                            {!! Form::label('end', 'Ende') !!}
-                           {!! Form::time('end', $entry->endCarbon()->format('H:i'), ['title'=>'end', 'class'=>'form-control'] ) !!}
+                           {!! Form::time('end', $entry->endCarbon()->format('H:i'), ['title'=>'end', 'class'=>'form-control', $entry->isEditable ? '' : 'readonly'] ) !!}
                         </div>
                         @include('includes.error', ['field'=>'end'])
 
                         <div class="form-group">
                            {!! Form::label('break', 'Pause') !!}
-                           {!! Form::number('break', null, ['title'=>'break', 'class'=>'form-control'] ) !!}
+                           {!! Form::number('break', null, ['title'=>'break', 'class'=>'form-control', $entry->isEditable ? '' : 'readonly'] ) !!}
                         </div>
                         @include('includes.error', ['field'=>'break'])
 
                         <div class="form-group">
                            {!! Form::label('comment', 'Kommentar:') !!}
-                           {!! Form::text('comment', null, ['title'=>'comment', 'class'=>'form-control'] ) !!}
+                           {!! Form::text('comment', null, ['title'=>'comment', 'class'=>'form-control', $entry->isEditable ? '' : 'readonly'] ) !!}
                         </div>
                         @include('includes.errors')
-                        <button class="btn btn-primary" name="command" value="save">Speichern</button>
-                        <button class="btn btn-danger" name="command" value="delete">Eintrag Löschen</button>
-
+                        @if($entry->isEditable)
+                            <button class="btn btn-primary" name="command" value="save">Speichern</button>
+                            <button class="btn btn-danger" name="command" value="delete">Eintrag Löschen</button>
+                        @endif
                     {!! Form::close() !!}
+
+                    @if(!$entry->isEditable)
+                        <a class="btn btn-primary" href="{{route('entries.index.month', ['year'=>$entry->dateCarbon()->format('Y'), 'month'=>$entry->dateCarbon()->format('n')])}}">OK</a>
+                    @endif
                 </div>
             </div>
         </div>

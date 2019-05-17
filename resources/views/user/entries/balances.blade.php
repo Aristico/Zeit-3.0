@@ -22,7 +22,17 @@
                                 <tr>
                                     <td>{{$monthes[$entry->dateCarbon()->format('n')]}} {{$entry->dateCarbon()->format('Y')}} </td>
                                     <td>{{number_format($entry->balance, 2, ',', '')}}</td>
-                                    <td><a href="{{route('entries.index.month', ['year'=>$entry->dateCarbon()->format('Y'), 'month'=>$entry->dateCarbon()->format('n')])}}">Anzeigen</a></td>
+                                    <td>
+                                        <a href="{{route('entries.index.month', ['year'=>$entry->dateCarbon()->format('Y'), 'month'=>$entry->dateCarbon()->format('n')])}}">Anzeigen</a>
+                                        @if($entry->isCorrectable)
+                                            <a href="{{route('entries.correction.add', $entry->id)}}">
+                                                @if($entry->correction != null)
+                                                    || Auszahlung Ändern
+                                                @else ($entry->correction = null)
+                                                    || Überstunden Auszahlen</a>
+                                                @endif
+                                            </td>
+                                        @endif
                                 </tr>
                             @endforeach
                         </tbody>

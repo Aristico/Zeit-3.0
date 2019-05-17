@@ -99,6 +99,7 @@ class EntryController extends Controller
             if ($entriesBase != null) {
 
                 $entries = $this->fillUpEmptyEntrys($entriesBase, $rangeOfQuery);
+                $isEditable = $entries[0]->isEditable;
 
             } else {
 
@@ -106,7 +107,7 @@ class EntryController extends Controller
 
             }
 
-            return view('user.entries.index', compact('entries'));
+            return view('user.entries.index', compact('entries', 'isEditable'));
 
     }
 
@@ -160,6 +161,7 @@ class EntryController extends Controller
         $monthes = ([1=>'Januar', 2=>'Februar', 3=>'März', 4=>'April',
                      5=>'Mai', 6=>'Juni', 7=>'Juli', 8=>'August',
                      9=>'September', 10=>'Oktober', 11=>'November', 12=>'Dezember']);
+
         return view('user.entries.balances', compact('entries', 'monthes'));
 
     }
@@ -179,6 +181,7 @@ class EntryController extends Controller
         }
 
     }
+
     public function initSet (EntryInitRequest $request)
     {
         $date = new Carbon(date('Y-01-01 00:00:00'));
@@ -287,6 +290,31 @@ class EntryController extends Controller
         }
     }
 
+    public function showCorrection ($id) {
+
+            $entry = Entry::findOrFail($id);
+
+            return view('user.entries.correction', compact('entry'));
+
+    }
+
+    public function setCorrection (Request $request, $id) {
+
+        $request->validate([
+            'correction' => 'min:0'
+        ]);
+
+        $input = $request->all();
+        $entry = Entry::findOrFail($id);
+
+        $entry->update(['correction' => $input['correction']]);
+
+        $this->recalculateBalance($entry);
+
+        return redirect(route('entries.index.balances'));
+
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -318,7 +346,9 @@ class EntryController extends Controller
             'overtime'=>$overtime
         ]);
 
-        $lastEntry = Entry::where([['user_id', $entry->user_id], ['date', '<', $entry->date]])->orderBy('date', 'desc')->first();
+        $this->recalculateBalance($entry);
+
+        /*$lastEntry = Entry::where([['user_id', $entry->user_id], ['date', '<', $entry->date]])->orderBy('date', 'desc')->first();
 
         $entries = Entry::where('date', '>', $lastEntry->date)->where('user_id', $entry->user_id)->orderBy('date', 'asc')->get();
 
@@ -327,7 +357,7 @@ class EntryController extends Controller
         foreach ($entries as $row) {
             $balance = $balance + $row->overtime;
             Entry::findOrFail($row->id)->update(['balance'=>$balance]);
-        }
+        } */
 
         return redirect(route('entries.index.month', ['month'=>$input['month'], 'year'=>$input['year']]));
 
@@ -357,6 +387,23 @@ class EntryController extends Controller
         return view('user.entries.edit', compact('entry'));
     }
 
+    public function recalculateBalance ($entry) {
+
+        $lastEntry = Entry::where([['user_id', $entry->user_id], ['date', '<', $entry->date]])->orderBy('date', 'desc')->first();
+
+        $entries = Entry::where('date', '>', $lastEntry->date)->where('user_id', $entry->user_id)->orderBy('date', 'asc')->get();
+
+        $balance = $lastEntry->balance;
+
+        $correction = 0;
+        foreach ($entries as $row) {
+            $balance = $balance + $row->overtime - $correction;
+            Entry::findOrFail($row->id)->update(['balance'=>$balance]);
+            $correction = $row->correction;
+        }
+
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -377,16 +424,7 @@ class EntryController extends Controller
             $input['overtime'] = $input['actual_hours'] - $entry->regular_hours;
             $entry->update($input);
 
-            $lastEntry = Entry::where([['user_id', $entry->user_id], ['date', '<', $entry->date]])->orderBy('date', 'desc')->first();
-
-            $entries = Entry::where('date', '>', $lastEntry->date)->where('user_id', $entry->user_id)->orderBy('date', 'asc')->get();
-
-            $balance = $lastEntry->balance;
-
-            foreach ($entries as $row) {
-                $balance = $balance + $row->overtime;
-                Entry::findOrFail($row->id)->update(['balance'=>$balance]);
-            }
+            $this->recalculateBalance($entry);
 
         return redirect(route('entries.index.month', ['month'=>$input['month'], 'year'=>$input['year']]));
 
@@ -424,25 +462,15 @@ class EntryController extends Controller
 
             $entry = Entry::findOrFail($id);
 
-            $lastEntry = Entry::where([['user_id', $entry->user_id], ['date', '<', $entry->date]])->orderBy('date', 'desc')->first();
-
             $entry->delete();
 
-            $balance = $lastEntry->balance;
-
-            $entries = Entry::where([['date', '>', $lastEntry->date], ['user_id', $lastEntry->user_id]])->orderBy('date', 'asc')->get();
-
-            foreach ($entries as $row) {
-                $balance = $balance + $row->overtime;
-                Entry::findOrFail($row->id)->update(['balance' => $balance]);
-            }
+            $this->recalculateBalance($entry);
 
             return redirect(route('entries.index.month', ['month'=>$input['month'], 'year'=>$input['year']]));
 
         } else {
 
             return redirect(route('entries.index.month', ['month'=>$input['month'], 'year'=>$input['year']]));
-
 
         }
 

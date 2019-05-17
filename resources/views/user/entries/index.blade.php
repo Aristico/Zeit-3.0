@@ -35,11 +35,19 @@
                                         <td></td>
                                         <td></td>
                                     @endif
-                                    <td>@if($entry->comment != 'no Entry')
-                                            <a href="{{route('entries.edit', $entry->id)}}">Bearbeiten</a>
+                                    <td>
+                                        @if($isEditable)
+                                            @if($entry->comment != 'no Entry')
+                                                <a href="{{route('entries.edit', $entry->id)}}">Bearbeiten</a>
+                                            @else
+                                                <a href="{{route('entries.create', ['date'=>$entry->date])}}">Erstellen</a>
+                                            @endif
                                         @else
-                                            <a href="{{route('entries.create', ['date'=>$entry->date])}}">Erstellen</a>
-                                        @endif</td>
+                                            @if($entry->comment != 'no Entry')
+                                                <a href="{{route('entries.edit', $entry->id)}}">Anzeigen</a>
+                                            @endif
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
