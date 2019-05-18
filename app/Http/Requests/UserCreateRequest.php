@@ -27,7 +27,7 @@ class UserCreateRequest extends FormRequest
             'firstname'=>'required',
             'name'=>'required',
             'email'=>'required',
-            'password'=>'required'
+            'password'=>'required|min:8'
         ];
     }
 
@@ -42,7 +42,8 @@ class UserCreateRequest extends FormRequest
             'firstname.required' => 'Bitte geben Sie Ihren Vornamen ein',
             'name.required'  => 'Bitte geben Sie Ihren Nachnamen ein',
             'email.required'  => 'Bitte geben Sie Ihre E-Mail-Adresse ein',
-            'password.required'  => 'Bitte geben Sie ein Passwort ein'
+            'password.required'  => 'Bitte geben Sie ein Passwort ein',
+            'password.min' => 'Das Passwort muss mindestens 8 Stellen haben'
         ];
     }
 }
