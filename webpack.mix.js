@@ -23,6 +23,6 @@ mix.js([
     'resources/js/jQuery.js',
     'resources/js/popper.js',
     'resources/js/bootstrap.min.js',
-    'resources/js/vue.js'
+    'resources/js/vue.min.js'
     ], 'public/js/all.js');
 */
