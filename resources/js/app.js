@@ -8,6 +8,7 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import store from './store'
 
 /**
  * The following block of code may be used to automatically register your
@@ -17,7 +18,6 @@ window.Vue = require('vue');
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
 
-Vue.component('example-component', require('./components/ExampleComponent.vue'));
 Vue.component('schedule-inputs', require('./components/ScheduleInputs.vue').default);
 Vue.component('schedule-form', require('./components/ScheduleForm.vue').default);
 Vue.component('schedule-day-selector', require('./components/ScheduleDaySelector.vue').default);
@@ -35,5 +35,6 @@ Vue.component('schedule-day-selector', require('./components/ScheduleDaySelector
  */
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    store
 });

@@ -5,6 +5,8 @@
                 v-for="(singleDay, key) in currentSchedule"
                 :key="key"
                 :item="key"
+                :dayActive="singleDay.day_active"
+                :dayNameOf="singleDay.name_of_day"
                 @toggleDay="toggleDay">
             </schedule-day-selector>
         </div>

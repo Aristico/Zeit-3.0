@@ -9,23 +9,18 @@
 
 <script>
 export default {
-    props: ['item'],
+    props: ['dayActive', 'dayNameOf', 'item'],
     data () {
         return {
+            active: this.dayActive,
             name: this.dayNameOf,
             itemKey: this.item,
             activeClass: ''
         }
     },
     computed: {
-        dayActive () {
-            return this.$store.getters.dayStatusActive(this.itemKey)
-        },
-        dayNameOf () {
-            return this.$store.getters.dayNameOf(this.itemKey)
-        },
         activityClass () {
-            if (this.dayActive === true) {
+            if (this.active === true) {
                 return 'badge-primary'
             } else {
                 return 'badge-secondary'
@@ -34,7 +29,11 @@ export default {
     },
     methods: {
         toggleDayActive () {
-            this.$store.commit('toggleDayActive', this.itemKey)
+            this.active = !this.active;
+            this.$emit('toggleDay', {
+                'key': this.itemKey,
+                'active': this.active
+            })
         }
 
     }

@@ -10,7 +10,7 @@
                 <div class="card-body">
 
                     <p class="alert alert-info">Sie Bearbeiten hier den Eintrag vom <b>{{$entry->dateCarbon()->format('d.m.Y')}}</b>. Die reguläre Arbeitszeit
-                       beträgt {{number_format($entry->regular_hours, 2, ',', '')}} Stunden und aktuell sind {{number_format($entry->regular_hours, 2, ',', '')}} Stunden vermerkt. Daraus ergibt sich
+                       beträgt {{number_format($entry->regular_hours, 2, ',', '')}} Stunden und aktuell sind {{number_format($entry->actual_hours, 2, ',', '')}} Stunden vermerkt. Daraus ergibt sich
                        eine Abweichung von {{number_format($entry->overtime, 2, ',', '')}} und ein Überstunden-Saldo von {{number_format($entry->balance, 2, ',', '')}} Stunden.</p>
 
                     <!-- bei Action den Controller und die Methode eintrage z.B. UserController@Create -->
